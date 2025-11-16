@@ -10,6 +10,7 @@ namespace BcaEttvCore
         public string Name { get; set; }
         public string Type { get; private set; }
         public Mesh Geometry { get; set; }
+        public double Area { get; private set; }
         public EttvOrientation Orientation { get; set; }
 
         public EttvConstruction Construction
@@ -122,6 +123,23 @@ namespace BcaEttvCore
                 if (angle >= 247.5 && angle < 292.5) return "South";
                 return "SouthEast";
             }
+        }
+
+        public void SetArea(GeometryBase geometry)
+        {
+            if (geometry is null)
+            {
+                Area = 0d;
+                return;
+            }
+
+            Area = geometry switch
+            {
+                Mesh mesh => AreaMassProperties.Compute(mesh)?.Area ?? 0d,
+                Brep brep => AreaMassProperties.Compute(brep)?.Area ?? 0d,
+                Surface surface => AreaMassProperties.Compute(surface)?.Area ?? 0d,
+                _ => 0d
+            };
         }
     }
 }

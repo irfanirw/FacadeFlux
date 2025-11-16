@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
@@ -138,7 +139,7 @@ namespace BcaEttv
                 var asm = System.Reflection.Assembly.GetExecutingAssembly();
                 using var stream = asm.GetManifestResourceStream("BcaEttv.Icons.DeconstructEttvSurface.png");
 #pragma warning disable CA1416
-                return stream == null ? null : new System.Drawing.Bitmap(stream);
+                return stream is null ? null : new System.Drawing.Bitmap(stream);
 #pragma warning restore CA1416
             }
         }
