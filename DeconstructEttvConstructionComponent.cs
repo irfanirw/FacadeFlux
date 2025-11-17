@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using BcaEttvCore;
@@ -9,7 +10,7 @@ namespace BcaEttv
     public class DeconstructEttvConstructionComponent : GH_Component
     {
         public DeconstructEttvConstructionComponent()
-          : base("DeconstructEttvConstruction", "DEC",
+          : base("Deconstruct EttvConstruction", "DEC",
                  "Deconstruct an EttvConstruction (Opaque or Fenestration) to a readable text",
                  "BcaEttv", "Utilities")
         { }
@@ -22,7 +23,7 @@ namespace BcaEttv
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddTextParameter("Text", "T", "Readable construction details", GH_ParamAccess.item);          // index 0
+            pManager.AddTextParameter("Summary", "S", "Readable construction details", GH_ParamAccess.item);      // index 0
             pManager.AddNumberParameter("Uvalue", "U", "U-value (W/m²K)", GH_ParamAccess.item);                    // index 1
             pManager.AddNumberParameter("ScValue", "SC", "Solar control value (ScTotal)", GH_ParamAccess.item);    // index 2
             pManager.AddGenericParameter("Materials", "M", "List of EttvMaterial", GH_ParamAccess.list);           // index 3
@@ -69,6 +70,10 @@ namespace BcaEttv
                             scValue = Convert.ToDouble(v);
                     }
                 }
+
+                var formula = BuildUValueFormula(mats, uValue);
+                if (!string.IsNullOrWhiteSpace(formula))
+                    result = string.IsNullOrWhiteSpace(result) ? formula : $"{result}{Environment.NewLine}{Environment.NewLine}{formula}";
             }
             else if (raw == null)
             {
@@ -84,6 +89,50 @@ namespace BcaEttv
             if (scIsEmpty) DA.SetData(2, null);
             else DA.SetData(2, scValue);
             DA.SetDataList(3, mats);
+        }
+
+        private static string BuildUValueFormula(IReadOnlyList<EttvMaterial> materials, double reportedU)
+        {
+            if (materials == null || materials.Count == 0)
+                return string.Empty;
+
+            const double Rsi = 0.12; // BCA internal surface resistance (m²·K/W)
+            const double Rse = 0.04; // BCA external surface resistance (m²·K/W)
+
+            var detailLines = new StringBuilder();
+            var sigmaTerms = new List<string>();
+            double layerSum = 0d;
+
+            for (int i = 0; i < materials.Count; i++)
+            {
+                var mat = materials[i];
+                if (mat == null)
+                    continue;
+
+                double thickness = mat.Thickness;
+                double conductivity = mat.ThermalConductivity;
+                double resistance = (thickness > 0 && conductivity > 0) ? thickness / conductivity : 0d;
+
+                layerSum += resistance;
+                sigmaTerms.Add($"R{i + 1}");
+                detailLines.AppendLine($"  R{i + 1} ({mat.Name ?? $"Layer {i + 1}"}) = t/k = {thickness:0.###} / {conductivity:0.###} = {resistance:0.###} m²·K/W");
+            }
+
+            if (sigmaTerms.Count == 0)
+                return string.Empty;
+
+            double totalR = Rsi + layerSum + Rse;
+            double calcU = totalR > 0 ? 1d / totalR : 0d;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("U-value derivation (BCA Singapore):");
+            sb.AppendLine($"  R_total = R_si + Σ(t_i/k_i) + R_se");
+            sb.AppendLine($"          = {Rsi:0.###} + {layerSum:0.###} + {Rse:0.###} = {totalR:0.###} m²·K/W");
+            sb.AppendLine($"  U = 1 / R_total = {calcU:0.###} W/m²K (reported: {reportedU:0.###} W/m²K)");
+            sb.AppendLine("Layer breakdown:");
+            sb.Append(detailLines.ToString().TrimEnd());
+
+            return sb.ToString();
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;

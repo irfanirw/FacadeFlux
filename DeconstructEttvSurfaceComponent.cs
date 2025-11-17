@@ -12,7 +12,7 @@ namespace BcaEttv
     public class DeconstructEttvSurfaceComponent : GH_Component
     {
         public DeconstructEttvSurfaceComponent()
-          : base("DeconstructEttvSurface", "DES",
+          : base("Deconstruct EttvSurface", "DES",
                  "Deconstruct a list of EttvSurface objects",
                  "BcaEttv", "Utilities")
         {

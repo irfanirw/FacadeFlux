@@ -10,8 +10,8 @@ namespace BcaEttv
     public class EttvSurfaceComponent : GH_Component
     {
         public EttvSurfaceComponent()
-          : base("EttvSurfaceComponent", "ES",
-                 "Create EttvSurface objects from Mesh or Brep geometry and a construction",
+          : base("EttvSurface", "ES",
+                 "Create EttvSurface objects from Mesh or Brep geometry and an EttvConstruction",
                  "BcaEttv", "Geometry & Inputs")
         { }
 

@@ -47,7 +47,9 @@ namespace BcaEttv
             { "Timber across grain, softwood", 0.125 },
             { "Timber hardwood", 0.138 },
             { "Timber plywood", 0.138 },
-            { "Vermiculite, loose granules (80 kg/m³)", 0.065 }
+            { "Vermiculite, loose granules (80 kg/m³)", 0.065 },
+            { "Oxygen gas", 0.0263 },
+            { "Argon gas", 0.0177 }
         };
 
         private string _selectedMaterial = MaterialDatabase.Keys.First();
