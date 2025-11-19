@@ -48,42 +48,24 @@ namespace BcaEttv
 
                 switch (g)
                 {
-                    case Mesh m:
-                        if (m != null && m.IsValid) meshes.Add(m);
+                    case Mesh m when m != null && m.IsValid:
+                        meshes.Add(m);
                         break;
-                    case Brep b:
-                        if (b != null && b.IsValid)
-                        {
-                            var brepMeshes = Mesh.CreateFromBrep(b, MeshingParameters.FastRenderMesh);
-                            if (brepMeshes != null)
-                            {
-                                foreach (var bm in brepMeshes)
-                                {
-                                    if (bm != null && bm.IsValid)
-                                        meshes.Add(bm);
-                                }
-                            }
-                        }
+
+                    case Brep b when b != null && b.IsValid:
+                        meshes.AddRange(MeshFromBrep(b));
                         break;
-                    // Allow Rhino geometry goo types
+
                     case GH_Mesh ghm when ghm.Value != null && ghm.Value.IsValid:
                         meshes.Add(ghm.Value);
                         break;
+
                     case GH_Brep ghb when ghb.Value != null && ghb.Value.IsValid:
-                        var brepMeshes2 = Mesh.CreateFromBrep(ghb.Value, MeshingParameters.FastRenderMesh);
-                        if (brepMeshes2 != null)
-                        {
-                            foreach (var bm in brepMeshes2)
-                            {
-                                if (bm != null && bm.IsValid)
-                                    meshes.Add(bm);
-                            }
-                        }
+                        meshes.AddRange(MeshFromBrep(ghb.Value));
                         break;
                 }
             }
 
-            // If nothing provided, output empty list quietly
             if (meshes.Count == 0 || construction == null)
             {
                 DA.SetDataList(0, new List<EttvSurface>());
@@ -92,19 +74,97 @@ namespace BcaEttv
 
             var surfaces = new List<EttvSurface>();
             int idCounter = 1;
+
             foreach (var mesh in meshes)
             {
-                var s = new EttvSurface
+                var surface = new EttvSurface
                 {
-                    Id = idCounter++,
-                    Name = $"Surf_{idCounter - 1}",
+                    Id = idCounter,
+                    Name = $"Surf_{idCounter}",
                     Geometry = mesh,
-                    Construction = construction // setter in EttvSurface sets Type based on construction subclass
+                    Construction = construction
                 };
-                surfaces.Add(s);
+
+                surface.Orientation = ComputeOrientation(mesh);
+                surface.SetArea(mesh);
+
+                surfaces.Add(surface);
+                idCounter++;
             }
 
             DA.SetDataList(0, surfaces);
+        }
+
+        private static IEnumerable<Mesh> MeshFromBrep(Brep brep)
+        {
+            var meshes = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
+            if (meshes == null) yield break;
+
+            foreach (var mesh in meshes)
+            {
+                if (mesh != null && mesh.IsValid)
+                    yield return mesh;
+            }
+        }
+
+        private static EttvOrientation ComputeOrientation(Mesh mesh)
+        {
+            if (mesh == null || !mesh.IsValid)
+                return null;
+
+            if (mesh.Normals.Count == 0)
+                mesh.Normals.ComputeNormals();
+
+            var avg = Vector3d.Zero;
+            for (int i = 0; i < mesh.Normals.Count; i++)
+                avg += new Vector3d(mesh.Normals[i]);
+
+            if (!avg.Unitize())
+            {
+                mesh.FaceNormals.ComputeFaceNormals();
+                for (int i = 0; i < mesh.FaceNormals.Count; i++)
+                    avg += new Vector3d(mesh.FaceNormals[i]);
+                if (!avg.Unitize())
+                    return null;
+            }
+
+            var name = ResolveOrientationName(avg);
+
+            return new EttvOrientation
+            {
+                Normal = avg,
+                Name = name,
+                Id = name
+            };
+        }
+
+        private static string ResolveOrientationName(Vector3d normal)
+        {
+            if (!normal.IsValid || normal.IsTiny())
+                return "Undefined";
+
+            if (!normal.Unitize())
+                return "Undefined";
+
+            const double verticalThreshold = 0.7;
+            if (Math.Abs(normal.Z) > verticalThreshold)
+                return normal.Z > 0 ? "Roof" : "Floor";
+
+            double angle = Math.Atan2(normal.Y, normal.X);
+            if (angle < 0) angle += 2 * Math.PI;
+            double deg = angle * 180.0 / Math.PI;
+
+            return deg switch
+            {
+                >= 22.5 and < 67.5 => "NorthEast",
+                >= 67.5 and < 112.5 => "North",
+                >= 112.5 and < 157.5 => "NorthWest",
+                >= 157.5 and < 202.5 => "West",
+                >= 202.5 and < 247.5 => "SouthWest",
+                >= 247.5 and < 292.5 => "South",
+                >= 292.5 and < 337.5 => "SouthEast",
+                _ => "East"
+            };
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
