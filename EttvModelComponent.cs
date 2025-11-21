@@ -20,7 +20,6 @@ namespace BcaEttv
             pManager.AddTextParameter("ProjectName", "PN", "Override EttvModel.ProjectName", GH_ParamAccess.item);
             pManager.AddTextParameter("Version", "V", "Override EttvModel.Version", GH_ParamAccess.item);
             pManager.AddGenericParameter("EttvSurfaces", "S", "List of EttvSurface objects", GH_ParamAccess.list);
-            pManager.AddTextParameter("Directory", "D", "Reserved for future export features (unused)", GH_ParamAccess.item);
             for (int i = 0; i < pManager.ParamCount; i++)
                 pManager[i].Optional = true;
         }
@@ -36,12 +35,10 @@ namespace BcaEttv
             string projectName = null;
             string version = null;
             var rawSurfaces = new List<object>();
-            string unusedDirectory = null; // kept for future use
 
             DA.GetData(0, ref projectName);
             DA.GetData(1, ref version);
             DA.GetDataList(2, rawSurfaces);
-            DA.GetData(3, ref unusedDirectory);
 
             var surfaces = new List<EttvSurface>();
             foreach (var item in rawSurfaces)
