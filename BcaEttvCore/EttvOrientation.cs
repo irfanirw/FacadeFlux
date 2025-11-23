@@ -8,33 +8,29 @@ namespace BcaEttvCore
         public string Id { get; set; }
         public string Name { get; set; }
         public Vector3d Normal { get; set; }
+        public double AngleToNorth { get; set; } = double.NaN;
+        public double Cf { get; set; }
 
         public EttvOrientation()
         {
             Id = string.Empty;
             Name = string.Empty;
-            Normal = Vector3d.ZAxis; // default normal pointing up
+            Normal = Vector3d.ZAxis;
         }
 
-        /// <summary>
-        /// Assign Name and Id based on the Normal vector direction.
-        /// Supports 8 cardinal directions on XY plane plus vertical (Roof/Floor).
-        /// </summary>
         public void AssignOrientation()
         {
-            if (Normal.Length == 0)
+            if (!Normal.IsValid || Normal.Length == 0)
             {
                 Id = "Unknown";
                 Name = "Unknown";
                 return;
             }
 
-            // Determine primary direction based on normal vector
             var absX = Math.Abs(Normal.X);
             var absY = Math.Abs(Normal.Y);
             var absZ = Math.Abs(Normal.Z);
 
-            // Check if surface is more vertical (roof/floor)
             if (absZ > absX && absZ > absY)
             {
                 if (Normal.Z > 0)
@@ -47,19 +43,18 @@ namespace BcaEttvCore
                     Id = "F";
                     Name = "Floor";
                 }
+
+                SetCf();
                 return;
             }
 
-            // Horizontal surface - determine cardinal direction on XY plane
-            // Calculate angle from positive X axis (East)
-            double angle = Math.Atan2(Normal.Y, Normal.X) * 180.0 / Math.PI;
-            if (angle < 0) angle += 360;
+            double computedAngle = Math.Atan2(Normal.X, Normal.Y) * 180.0 / Math.PI;
+            double angle = NormalizeAngle(double.IsNaN(AngleToNorth) ? computedAngle : AngleToNorth);
 
-            // 8 cardinal directions (45° each)
             if (angle >= 337.5 || angle < 22.5)
             {
-                Id = "E";
-                Name = "East";
+                Id = "N";
+                Name = "North";
             }
             else if (angle >= 22.5 && angle < 67.5)
             {
@@ -68,18 +63,18 @@ namespace BcaEttvCore
             }
             else if (angle >= 67.5 && angle < 112.5)
             {
-                Id = "N";
-                Name = "North";
+                Id = "E";
+                Name = "East";
             }
             else if (angle >= 112.5 && angle < 157.5)
             {
-                Id = "NW";
-                Name = "NorthWest";
+                Id = "SE";
+                Name = "SouthEast";
             }
             else if (angle >= 157.5 && angle < 202.5)
             {
-                Id = "W";
-                Name = "West";
+                Id = "S";
+                Name = "South";
             }
             else if (angle >= 202.5 && angle < 247.5)
             {
@@ -88,14 +83,40 @@ namespace BcaEttvCore
             }
             else if (angle >= 247.5 && angle < 292.5)
             {
-                Id = "S";
-                Name = "South";
+                Id = "W";
+                Name = "West";
             }
-            else // 292.5 to 337.5
+            else
             {
-                Id = "SE";
-                Name = "SouthEast";
+                Id = "NW";
+                Name = "NorthWest";
             }
+
+            SetCf();
+        }
+
+        private static double NormalizeAngle(double angle)
+        {
+            double normalized = angle % 360.0;
+            if (normalized < 0)
+                normalized += 360.0;
+            return normalized;
+        }
+
+        public void SetCf()
+        {
+            Cf = Id switch
+            {
+                "N" => 0.80,
+                "NE" => 0.97,
+                "E" => 1.13,
+                "SE" => 0.98,
+                "S" => 0.83,
+                "SW" => 1.06,
+                "W" => 1.23,
+                "NW" => 1.03,
+                _ => 1.00
+            };
         }
     }
 }
