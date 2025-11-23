@@ -10,6 +10,19 @@ namespace BcaEttvCore
         public double EttvLimit { get; set; } = 50.0; // Default ETTV limit (W/m²)
         public string Climate { get; set; } = "Tropical"; // Default climate
 
+        private static readonly Dictionary<string, double> CoolingFactors = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "North", 211.0 },
+            { "NorthEast", 218.0 },
+            { "East", 224.0 },
+            { "SouthEast", 236.0 },
+            { "South", 240.0 },
+            { "SouthWest", 236.0 },
+            { "West", 224.0 },
+            { "NorthWest", 218.0 },
+            { "Roof", 150.0 }
+        };
+
         public EttvCalculator() { }
 
         public EttvCalculator(EttvModel model)
@@ -36,63 +49,62 @@ namespace BcaEttvCore
                 return null;
             }
 
-            double wallArea = 0.0;
-            double windowArea = 0.0;
-            double roofArea = 0.0;
-
-            double wallContribution = 0.0;
-            double windowSolarContribution = 0.0;
-            double windowConductiveContribution = 0.0;
-            double roofContribution = 0.0;
+            double sumWeightedEttv = 0.0;
+            double totalGrossArea = 0.0;
 
             var orientationBreakdown = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             var componentBreakdown = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var surface in Model.Surfaces)
+            foreach (var group in Model.Surfaces.Where(s => s != null)
+                                                .GroupBy(s => s.Orientation?.Name ?? "Unknown"))
             {
-                if (surface == null) continue;
+                var surfaces = group.ToList();
+                double wallArea = surfaces.Where(IsOpaque).Sum(GetSurfaceArea);
+                double windowArea = surfaces.Where(IsFenestration).Sum(GetSurfaceArea);
+                double grossArea = wallArea + windowArea;
+                if (grossArea <= double.Epsilon)
+                    continue;
 
-                double area = GetSurfaceArea(surface);
-                if (area <= double.Epsilon) continue;
+                double wwr = windowArea / grossArea;
 
-                string orientation = surface.Orientation?.Name ?? "Unknown";
-                string componentKey = GetComponentKey(surface, orientation);
-                double uValue = surface.Construction?.Uvalue ?? 0.0;
-                double contribution = 0.0;
+                double wallAreaWeightedU = AreaWeightedAverage(
+                    surfaces.Where(IsOpaque),
+                    s => s.Construction?.Uvalue ?? 0.0);
 
-                if (IsFenestration(surface))
-                {
-                    windowArea += area;
+                double windowAreaWeightedSc = AreaWeightedAverage(
+                    surfaces.Where(IsFenestration),
+                    s => GetScTotal(s.Construction as EttvFenestrationConstruction));
 
-                    double sc = GetScTotal(surface.Construction as EttvFenestrationConstruction);
-                    double cf = GetCoolingFactor(orientation);
-                    double solarGain = cf * area * sc;
-                    double conductiveGain = uValue * area;
+                string orientationName = group.Key;
+                double cf = GetCoolingFactor(orientationName);
 
-                    windowSolarContribution += solarGain;
-                    windowConductiveContribution += conductiveGain;
-                    contribution = solarGain + conductiveGain;
-                }
-                else if (IsRoof(orientation))
-                {
-                    roofArea += area;
-                    contribution = uValue * area;
-                    roofContribution += contribution;
-                }
-                else
-                {
-                    wallArea += area;
-                    contribution = uValue * area;
-                    wallContribution += contribution;
-                }
+                double ettv = 15.0 * (1.0 - wwr)
+                              + (wwr * wallAreaWeightedU * cf)
+                              + (wwr * windowAreaWeightedSc * 0.45);
 
-                AddContribution(orientationBreakdown, orientation, contribution);
-                AddContribution(componentBreakdown, componentKey, contribution);
+                sumWeightedEttv += ettv * grossArea;
+                totalGrossArea += grossArea;
+
+                orientationBreakdown[orientationName] = ettv;
+
+                componentBreakdown[$"{orientationName}-WallArea"] = wallArea;
+                componentBreakdown[$"{orientationName}-WindowArea"] = windowArea;
             }
 
-            double totalArea = wallArea + windowArea + roofArea;
-            double numerator = wallContribution + windowSolarContribution + windowConductiveContribution + roofContribution;
-            double ettvValue = totalArea > 0 ? numerator / totalArea : 0.0;
+            if (totalGrossArea <= double.Epsilon)
+            {
+                Model.ComputationResult = new EttvComputationResult
+                {
+                    EttvValue = null,
+                    Pass = false,
+                    Limit = EttvLimit,
+                    Climate = Climate,
+                    Notes = "Surface areas are zero."
+                };
+                return null;
+            }
+
+            double ettvValue = sumWeightedEttv / totalGrossArea;
             bool pass = ettvValue <= EttvLimit;
 
             Model.ComputationResult = new EttvComputationResult(ettvValue, pass, EttvLimit)
@@ -106,6 +118,24 @@ namespace BcaEttvCore
             return ettvValue;
         }
 
+        private static double AreaWeightedAverage(IEnumerable<EttvSurface> surfaces, Func<EttvSurface, double> selector)
+        {
+            double numerator = 0.0;
+            double denominator = 0.0;
+
+            foreach (var surface in surfaces)
+            {
+                double area = GetSurfaceArea(surface);
+                if (area <= double.Epsilon)
+                    continue;
+
+                numerator += selector(surface) * area;
+                denominator += area;
+            }
+
+            return denominator > double.Epsilon ? numerator / denominator : 0.0;
+        }
+
         private static string GetComponentKey(EttvSurface surface, string orientation)
         {
             if (IsRoof(orientation))
@@ -116,6 +146,9 @@ namespace BcaEttvCore
 
         private static bool IsRoof(string orientation) =>
             string.Equals(orientation, "Roof", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsOpaque(EttvSurface surface) =>
+            surface != null && !IsFenestration(surface);
 
         private static bool IsFenestration(EttvSurface surface) =>
             string.Equals(surface?.Type, "Fenestration", StringComparison.OrdinalIgnoreCase) ||
@@ -161,48 +194,9 @@ namespace BcaEttvCore
             if (!mesh.IsValid || mesh.Faces.Count == 0) return 0.0;
 
             var amp = AreaMassProperties.Compute(mesh);
-            if (amp != null)
-                return amp.Area;
+            if (amp == null || amp.Area <= double.Epsilon) return 0.0;
 
-            double area = 0.0;
-            for (int i = 0; i < mesh.Faces.Count; i++)
-            {
-                var face = mesh.Faces[i];
-                var a = mesh.Vertices[face.A];
-                var b = mesh.Vertices[face.B];
-                var c = mesh.Vertices[face.C];
-                area += TriangleArea(a, b, c);
-
-                if (face.IsQuad)
-                {
-                    var d = mesh.Vertices[face.D];
-                    area += TriangleArea(a, c, d);
-                }
-            }
-
-            return area;
+            return amp.Area;
         }
-
-        private static double TriangleArea(Point3f a, Point3f b, Point3f c)
-        {
-            var v1 = new Vector3d(b.X - a.X, b.Y - a.Y, b.Z - a.Z);
-            var v2 = new Vector3d(c.X - a.X, c.Y - a.Y, c.Z - a.Z);
-            return 0.5 * Vector3d.CrossProduct(v1, v2).Length;
-        }
-
-        private static readonly Dictionary<string, double> CoolingFactors = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["North"] = 143.0,
-            ["NorthEast"] = 169.0,
-            ["East"] = 193.0,
-            ["SouthEast"] = 211.0,
-            ["South"] = 193.0,
-            ["SouthWest"] = 211.0,
-            ["West"] = 193.0,
-            ["NorthWest"] = 169.0,
-            ["Roof"] = 0.0,
-            ["Floor"] = 0.0,
-            ["Unknown"] = 211.0
-        };
     }
 }

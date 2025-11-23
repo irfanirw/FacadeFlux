@@ -9,7 +9,9 @@ namespace BcaEttvCore
         public double WindowArea { get; set; }
         public double TotalHeatGain { get; set; }
         public double AverageHeatGain { get; set; }
+        public string Summary { get; set; } = string.Empty;
         public List<EttvSurface> Surfaces { get; set; } = new();
+        public List<EttvConstruction> UniqueConstructions { get; set; } = new();
 
         public double GrossArea => WallArea + WindowArea;
 
