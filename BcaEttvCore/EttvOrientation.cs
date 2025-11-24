@@ -105,18 +105,30 @@ namespace BcaEttvCore
 
         public void SetCf()
         {
-            Cf = Id switch
+            var key = NormalizeOrientationKey(Id) ?? NormalizeOrientationKey(Name);
+
+            Cf = key switch
             {
-                "N" => 0.80,
-                "NE" => 0.97,
-                "E" => 1.13,
-                "SE" => 0.98,
-                "S" => 0.83,
-                "SW" => 1.06,
-                "W" => 1.23,
-                "NW" => 1.03,
+                "N" or "NORTH" => 0.80,
+                "NE" or "NORTHEAST" => 0.97,
+                "E" or "EAST" => 1.13,
+                "SE" or "SOUTHEAST" => 0.98,
+                "S" or "SOUTH" => 0.83,
+                "SW" or "SOUTHWEST" => 1.06,
+                "W" or "WEST" => 1.23,
+                "NW" or "NORTHWEST" => 1.03,
                 _ => 1.00
             };
+        }
+
+        private static string NormalizeOrientationKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            return value.Replace(" ", string.Empty)
+                        .Replace("-", string.Empty)
+                        .ToUpperInvariant();
         }
     }
 }

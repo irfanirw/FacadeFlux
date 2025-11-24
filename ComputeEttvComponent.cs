@@ -57,6 +57,13 @@ namespace BcaEttv
                 return;
             }
 
+            // Compute per-surface heat gain before aggregating model results
+            if (model.Surfaces != null)
+            {
+                foreach (var surface in model.Surfaces)
+                    surface?.ComputeHeatGain();
+            }
+
             var result = EttvModelCalculator.Calculate(model);
             DA.SetData(0, result.ResultSummary);
             DA.SetData(1, result.OverallAverageEttv);

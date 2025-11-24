@@ -2,6 +2,9 @@ using Rhino.Geometry;
 
 namespace BcaEttvCore
 {
+    /// <summary>
+    /// Represents a single building surface with geometry, construction, orientation, and computed heat gain metadata.
+    /// </summary>
     public class EttvSurface
     {
         private EttvConstruction _construction;
@@ -11,6 +14,7 @@ namespace BcaEttvCore
         public string Type { get; private set; }
         public Mesh Geometry { get; set; }
         public double Area { get; private set; }
+        public double HeatGain { get; set; }
         public EttvOrientation Orientation { get; set; }
 
         public EttvConstruction Construction
@@ -33,6 +37,31 @@ namespace BcaEttvCore
         {
             Name = string.Empty;
             Type = "Unknown";
+        }
+
+        public void ComputeHeatGain()
+        {
+            if (_construction == null || Area <= 0)
+            {
+                HeatGain = 0d;
+                return;
+            }
+
+            var cf = Orientation?.Cf > 0 ? Orientation.Cf : 1d;
+
+            if (_construction is EttvOpaqueConstruction)
+            {
+                HeatGain = 12d * Area * _construction.Uvalue;
+            }
+            else if (_construction is EttvFenestrationConstruction fen)
+            {
+                var scTotal = fen.ScTotal > 0 ? fen.ScTotal : 1d;
+                HeatGain = (3.4d * Area * _construction.Uvalue) + (211d * Area * scTotal * cf);
+            }
+            else
+            {
+                HeatGain = 0d;
+            }
         }
 
         /// <summary>
