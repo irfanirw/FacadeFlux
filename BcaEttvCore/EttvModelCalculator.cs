@@ -76,6 +76,7 @@ namespace BcaEttvCore
 
                 orientationResult.AverageHeatGain = etTvValue;
                 orientationResult.TotalHeatGain = etTvValue * gross;
+                orientationResult.BuildSummary();
 
                 result.WallArea += orientationResult.WallArea;
                 result.WindowArea += orientationResult.WindowArea;

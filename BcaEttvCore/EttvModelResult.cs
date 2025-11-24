@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,6 +28,33 @@ namespace BcaEttvCore
             sb.AppendLine($"Gross area: {GrossArea:0.###} m²");
             sb.AppendLine($"Total gross heat gain: {TotalHeatGain:0.###} W");
             sb.AppendLine($"Average heat gain: {AverageHeatGain:0.###} W/m²");
+
+            if (ResultByOrientation.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("Breakdown by orientation:");
+
+                foreach (var orientationResult in ResultByOrientation)
+                {
+                    if (orientationResult == null)
+                        continue;
+
+                    if (string.IsNullOrWhiteSpace(orientationResult.Summary))
+                        orientationResult.BuildSummary();
+
+                    if (string.IsNullOrWhiteSpace(orientationResult.Summary))
+                        continue;
+
+                    var lines = orientationResult.Summary.Split(new[] { '\r', '\n' },
+                                                               StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
+                        sb.AppendLine($"- {line}");
+
+                    sb.AppendLine();
+                }
+            }
+
             ResultSummary = sb.ToString().TrimEnd();
         }
     }

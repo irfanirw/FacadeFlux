@@ -8,27 +8,32 @@ namespace BcaEttvCore
     {
         // Assumes Thickness is in millimetres; converts to meters internally.
         // Uses standard internal/external surface resistances (Rsi=0.13, Rse=0.04 m²K/W).
-        public static double ComputeUValue(List<EttvMaterial> materials)
+        public static double ComputeUValue(IEnumerable<EttvMaterial> materials)
         {
-            if (materials == null || materials.Count == 0) return 0.0;
+            const double Rsi = 0.12; // internal surface film (BCA Singapore)
+            const double Rse = 0.04; // external surface film (BCA Singapore)
 
-            const double Rsi = 0.12;
-            const double Rse = 0.044;
+            if (materials == null)
+                return 0.0;
 
-            double rLayers = 0.0;
-            foreach (var m in materials)
+            double layerResistance = 0.0;
+
+            foreach (var mat in materials)
             {
-                if (m == null) continue;
-                if (m.ThermalConductivity <= 0) continue;
+                if (mat == null)
+                    continue;
 
-                double thicknessMeters = m.Thickness / 1000.0;
-                rLayers += thicknessMeters / m.ThermalConductivity;
+                var k = mat.ThermalConductivity;
+                var t = mat.Thickness;
+
+                if (k <= 0 || t <= 0)
+                    continue;
+
+                layerResistance += t / k;
             }
 
-            double rTotal = Rsi + rLayers + Rse;
-            if (rTotal <= 0) return 0.0;
-
-            return 1.0 / rTotal;
+            var totalResistance = Rsi + layerResistance + Rse;
+            return totalResistance <= 0 ? 0.0 : 1.0 / totalResistance;
         }
     }
 }
