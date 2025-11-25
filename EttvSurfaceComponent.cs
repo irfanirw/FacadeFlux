@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using BcaEttvCore;
 
@@ -9,45 +10,161 @@ namespace BcaEttv
     public class EttvSurfaceComponent : GH_Component
     {
         public EttvSurfaceComponent()
-          : base("EttvSurfaceComponent", "ES",
-                 "Create a list of EttvSurface from meshes and a construction",
+          : base("EttvSurface", "ES",
+                 "Create EttvSurface objects from Mesh or Brep geometry and an EttvConstruction",
                  "BcaEttv", "Geometry & Inputs")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            // list of Rhino meshes
-            pManager.AddMeshParameter("Meshes", "M", "Input Rhino meshes", GH_ParamAccess.list);
-            // EttvConstruction (from BcaEttvCore)
+            // Accept both Mesh and Brep by using a generic parameter
+            pManager.AddGenericParameter("Geometry", "G", "Meshes or Breps (Brep will be meshed)", GH_ParamAccess.list);
             pManager.AddGenericParameter("EttvConstruction", "C", "EttvConstruction object", GH_ParamAccess.item);
 
-            // allow inputs to be empty without producing the yellow/orange missing-input warning
             pManager[0].Optional = true;
             pManager[1].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // list of EttvSurface objects (not implemented yet)
-            pManager.AddGenericParameter("EttvSurfaces", "S", "List of EttvSurface objects (not implemented)", GH_ParamAccess.list);
+            pManager.AddGenericParameter("EttvSurfaces", "S", "List of EttvSurface objects", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // Placeholder for future implementation.
-            // Read inputs quietly (they are optional) and return an empty list for now.
-
-            var meshes = new List<Mesh>();
+            var rawGeometry = new List<object>();
             EttvConstruction construction = null;
 
-            // Try to get inputs if provided; missing inputs won't trigger warnings because params are optional.
-            DA.GetDataList(0, meshes);
+            DA.GetDataList(0, rawGeometry);
             DA.GetData(1, ref construction);
 
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "EttvSurfaceComponent: SolveInstance not implemented.");
+            var meshes = new List<Mesh>();
 
-            // Output an empty list until implementation is provided.
-            DA.SetDataList(0, new List<object>());
+            foreach (var item in rawGeometry)
+            {
+                object g = item;
+                if (g is IGH_Goo goo)
+                    g = (goo as GH_ObjectWrapper)?.Value ?? goo.ScriptVariable();
+
+                switch (g)
+                {
+                    case Mesh m when m != null && m.IsValid:
+                        meshes.Add(m);
+                        break;
+
+                    case Brep b when b != null && b.IsValid:
+                        meshes.AddRange(MeshFromBrep(b));
+                        break;
+
+                    case GH_Mesh ghm when ghm.Value != null && ghm.Value.IsValid:
+                        meshes.Add(ghm.Value);
+                        break;
+
+                    case GH_Brep ghb when ghb.Value != null && ghb.Value.IsValid:
+                        meshes.AddRange(MeshFromBrep(ghb.Value));
+                        break;
+                }
+            }
+
+            if (meshes.Count == 0 || construction == null)
+            {
+                DA.SetDataList(0, new List<EttvSurface>());
+                return;
+            }
+
+            var surfaces = new List<EttvSurface>();
+            int idCounter = 1;
+
+            foreach (var mesh in meshes)
+            {
+                var surface = new EttvSurface
+                {
+                    Id = idCounter,
+                    Name = $"Surf_{idCounter}",
+                    Geometry = mesh,
+                    Construction = construction
+                };
+
+                surface.Orientation = ComputeOrientation(mesh);
+                surface.SetArea(mesh);
+
+                surfaces.Add(surface);
+                idCounter++;
+            }
+
+            DA.SetDataList(0, surfaces);
+        }
+
+        private static IEnumerable<Mesh> MeshFromBrep(Brep brep)
+        {
+            var meshes = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
+            if (meshes == null) yield break;
+
+            foreach (var mesh in meshes)
+            {
+                if (mesh != null && mesh.IsValid)
+                    yield return mesh;
+            }
+        }
+
+        private static EttvOrientation ComputeOrientation(Mesh mesh)
+        {
+            if (mesh == null || !mesh.IsValid)
+                return null;
+
+            if (mesh.Normals.Count == 0)
+                mesh.Normals.ComputeNormals();
+
+            var avg = Vector3d.Zero;
+            for (int i = 0; i < mesh.Normals.Count; i++)
+                avg += new Vector3d(mesh.Normals[i]);
+
+            if (!avg.Unitize())
+            {
+                mesh.FaceNormals.ComputeFaceNormals();
+                for (int i = 0; i < mesh.FaceNormals.Count; i++)
+                    avg += new Vector3d(mesh.FaceNormals[i]);
+                if (!avg.Unitize())
+                    return null;
+            }
+
+            var name = ResolveOrientationName(avg);
+
+            return new EttvOrientation
+            {
+                Normal = avg,
+                Name = name,
+                Id = name
+            };
+        }
+
+        private static string ResolveOrientationName(Vector3d normal)
+        {
+            if (!normal.IsValid || normal.IsTiny())
+                return "Undefined";
+
+            if (!normal.Unitize())
+                return "Undefined";
+
+            const double verticalThreshold = 0.7;
+            if (Math.Abs(normal.Z) > verticalThreshold)
+                return normal.Z > 0 ? "Roof" : "Floor";
+
+            double angle = Math.Atan2(normal.Y, normal.X);
+            if (angle < 0) angle += 2 * Math.PI;
+            double deg = angle * 180.0 / Math.PI;
+
+            return deg switch
+            {
+                >= 22.5 and < 67.5 => "NorthEast",
+                >= 67.5 and < 112.5 => "North",
+                >= 112.5 and < 157.5 => "NorthWest",
+                >= 157.5 and < 202.5 => "West",
+                >= 202.5 and < 247.5 => "SouthWest",
+                >= 247.5 and < 292.5 => "South",
+                >= 292.5 and < 337.5 => "SouthEast",
+                _ => "East"
+            };
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
@@ -57,17 +174,10 @@ namespace BcaEttv
             get
             {
                 var asm = System.Reflection.Assembly.GetExecutingAssembly();
-                string fileName = "EttvSurface.png";
-                // find resource name robustly (case-insensitive)
-                var resourceName = Array.Find(asm.GetManifestResourceNames(),
-                    n => n.EndsWith("." + fileName, StringComparison.OrdinalIgnoreCase));
-                if (resourceName is null)
-                    resourceName = Array.Find(asm.GetManifestResourceNames(),
-                        n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
-                if (resourceName is null) return null;
-
-                using var stream = asm.GetManifestResourceStream(resourceName);
+                using var stream = asm.GetManifestResourceStream("BcaEttv.Icons.EttvSurface.png");
+#pragma warning disable CA1416
                 return stream is null ? null : new System.Drawing.Bitmap(stream);
+#pragma warning restore CA1416
             }
         }
 

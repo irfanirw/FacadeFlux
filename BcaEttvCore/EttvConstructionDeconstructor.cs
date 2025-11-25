@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace BcaEttvCore
 {
-    public static class DeconstructEttvConstruction
+    public static class EttvConstructionDeconstructor
     {
         // Returns a human-readable text describing the construction and its materials.
         public static string ToText(EttvConstruction construction)
@@ -25,12 +25,14 @@ namespace BcaEttvCore
             sb.AppendLine($"Uvalue: {construction.Uvalue:0.###} W/m²K");
 
             // SC values (use reflection, since property names may vary: Sc/SC/SC1/SC2)
-            if (TryReadDouble(construction, "SC1", out var sc1))
-                sb.AppendLine($"SC1: {sc1:0.###}");
-            if (TryReadDouble(construction, "SC2", out var sc2))
-                sb.AppendLine($"SC2: {sc2:0.###}");
-            else if (TryReadDouble(construction, "SC", out var sc) || TryReadDouble(construction, "Sc", out sc))
-                sb.AppendLine($"SC: {sc:0.###}");
+            if (TryReadDouble(construction, "Sc1", out var sc1))
+                sb.AppendLine($"Sc1: {sc1:0.###}");
+            if (TryReadDouble(construction, "Sc2", out var sc2))
+                sb.AppendLine($"Sc2: {sc2:0.###}");
+            if (TryReadDouble(construction, "ScTotal", out var scTotal))
+                sb.AppendLine($"ScTotal: {scTotal:0.###}");
+            else if (TryReadDouble(construction, "Sc", out var sc) || TryReadDouble(construction, "Sc", out sc))
+                sb.AppendLine($"Sc: {sc:0.###}");
 
             // Materials list
             if (construction.EttvMaterials != null && construction.EttvMaterials.Count > 0)

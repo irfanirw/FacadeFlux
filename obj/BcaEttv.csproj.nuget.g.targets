@@ -1,15 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Condition=" '$(TargetFramework)' == 'net48' AND '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/net462/System.Text.Json.targets" Condition="Exists('$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/net462/System.Text.Json.targets')" />
     <Import Project="$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets" Condition="Exists('$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.netframework.referenceassemblies.net48/1.0.3/build/Microsoft.NETFramework.ReferenceAssemblies.net48.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.netframework.referenceassemblies.net48/1.0.3/build/Microsoft.NETFramework.ReferenceAssemblies.net48.targets')" />
     <Import Project="$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets" Condition="Exists('$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets')" />
   </ImportGroup>
   <ImportGroup Condition=" '$(TargetFramework)' == 'net7.0' AND '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)system.text.encodings.web/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Encodings.Web.targets" Condition="Exists('$(NuGetPackageRoot)system.text.encodings.web/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Encodings.Web.targets')" />
+    <Import Project="$(NuGetPackageRoot)system.io.pipelines/9.0.10/buildTransitive/netcoreapp2.0/System.IO.Pipelines.targets" Condition="Exists('$(NuGetPackageRoot)system.io.pipelines/9.0.10/buildTransitive/netcoreapp2.0/System.IO.Pipelines.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.bcl.asyncinterfaces/9.0.10/buildTransitive/netcoreapp2.0/Microsoft.Bcl.AsyncInterfaces.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.bcl.asyncinterfaces/9.0.10/buildTransitive/netcoreapp2.0/Microsoft.Bcl.AsyncInterfaces.targets')" />
+    <Import Project="$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Json.targets" Condition="Exists('$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Json.targets')" />
     <Import Project="$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets" Condition="Exists('$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets')" />
     <Import Project="$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets" Condition="Exists('$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets')" />
   </ImportGroup>
   <ImportGroup Condition=" '$(TargetFramework)' == 'net7.0-windows' AND '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)system.text.encodings.web/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Encodings.Web.targets" Condition="Exists('$(NuGetPackageRoot)system.text.encodings.web/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Encodings.Web.targets')" />
+    <Import Project="$(NuGetPackageRoot)system.io.pipelines/9.0.10/buildTransitive/netcoreapp2.0/System.IO.Pipelines.targets" Condition="Exists('$(NuGetPackageRoot)system.io.pipelines/9.0.10/buildTransitive/netcoreapp2.0/System.IO.Pipelines.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.bcl.asyncinterfaces/9.0.10/buildTransitive/netcoreapp2.0/Microsoft.Bcl.AsyncInterfaces.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.bcl.asyncinterfaces/9.0.10/buildTransitive/netcoreapp2.0/Microsoft.Bcl.AsyncInterfaces.targets')" />
+    <Import Project="$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Json.targets" Condition="Exists('$(NuGetPackageRoot)system.text.json/9.0.10/buildTransitive/netcoreapp2.0/System.Text.Json.targets')" />
     <Import Project="$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets" Condition="Exists('$(NuGetPackageRoot)rhinocommon/8.0.23304.9001/build/net48/RhinoCommon.targets')" />
     <Import Project="$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets" Condition="Exists('$(NuGetPackageRoot)grasshopper/8.0.23304.9001/build/net48/Grasshopper.targets')" />
   </ImportGroup>

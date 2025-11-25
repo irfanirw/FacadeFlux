@@ -1,0 +1,73 @@
+{
+  "projectName": "EttvProject_8",
+  "version": "8",
+  "reordered": true,
+  "ettvSurfaceOrder": [
+    [
+      4
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      2
+    ],
+    [
+      3
+    ]
+  ],
+  "surfaces": [
+    {
+      "id": 0,
+      "name": "Surf_1",
+      "type": "Fenestration",
+      "orientation": "East",
+      "constructionId": "1",
+      "constructionName": "Double Glazing",
+      "uvalue": 6.0963106236525775,
+      "scTotal": 0.43,
+      "materialCount": 3
+    },
+    {
+      "id": 1,
+      "name": "Surf_1",
+      "type": "Wall",
+      "orientation": "East",
+      "constructionId": "2",
+      "constructionName": "Precast Concrete",
+      "uvalue": 6.094835642598839,
+      "materialCount": 1
+    },
+    {
+      "id": 2,
+      "name": "Surf_2",
+      "type": "Wall",
+      "orientation": "South",
+      "constructionId": "2",
+      "constructionName": "Precast Concrete",
+      "uvalue": 6.094835642598839,
+      "materialCount": 1
+    },
+    {
+      "id": 3,
+      "name": "Surf_3",
+      "type": "Wall",
+      "orientation": "West",
+      "constructionId": "2",
+      "constructionName": "Precast Concrete",
+      "uvalue": 6.094835642598839,
+      "materialCount": 1
+    },
+    {
+      "id": 4,
+      "name": "Surf_4",
+      "type": "Wall",
+      "orientation": "North",
+      "constructionId": "2",
+      "constructionName": "Precast Concrete",
+      "uvalue": 6.094835642598839,
+      "materialCount": 1
+    }
+  ]
+}

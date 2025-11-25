@@ -14,3 +14,8 @@
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/obj/Debug/net7.0-windows/BcaEttv.pdb
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/obj/Debug/net7.0-windows/BcaEttv.genruntimeconfig.cache
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/obj/Debug/net7.0-windows/ref/BcaEttv.gha
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/bin/Debug/net7.0-windows/Microsoft.Bcl.AsyncInterfaces.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/bin/Debug/net7.0-windows/Newtonsoft.Json.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/bin/Debug/net7.0-windows/System.IO.Pipelines.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/bin/Debug/net7.0-windows/System.Text.Encodings.Web.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/bin/Debug/net7.0-windows/System.Text.Json.dll

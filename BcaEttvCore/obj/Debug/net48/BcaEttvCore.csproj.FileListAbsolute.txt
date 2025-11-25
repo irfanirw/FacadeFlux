@@ -6,3 +6,15 @@
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/BcaEttvCore.pdb
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/obj/Debug/net48/BcaEttvCore.dll
 /Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/obj/Debug/net48/BcaEttvCore.pdb
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/Microsoft.Bcl.AsyncInterfaces.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/Newtonsoft.Json.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Buffers.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.IO.Pipelines.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Memory.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Numerics.Vectors.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Runtime.CompilerServices.Unsafe.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Text.Encodings.Web.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Text.Json.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.Threading.Tasks.Extensions.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/bin/Debug/net48/System.ValueTuple.dll
+/Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/obj/Debug/net48/BcaEttvC.E2765ED6.Up2Date

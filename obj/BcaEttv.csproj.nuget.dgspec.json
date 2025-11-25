@@ -233,10 +233,18 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
+            },
             "RhinoCommon": {
               "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "target": "Package",
               "version": "[8.0.23304.9001, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             }
           },
           "imports": [
@@ -270,10 +278,18 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
+            },
             "RhinoCommon": {
               "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "target": "Package",
               "version": "[8.0.23304.9001, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             }
           },
           "imports": [
@@ -303,10 +319,18 @@
               "version": "[1.0.3, )",
               "autoReferenced": true
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
+            },
             "RhinoCommon": {
               "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "target": "Package",
               "version": "[8.0.23304.9001, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             }
           },
           "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.306/RuntimeIdentifierGraph.json"

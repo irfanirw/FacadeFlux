@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="RhinoCommon" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+    <PackageReference Include="System.Text.Json" Version="9.0.10" />
   </ItemGroup>
 
 </Project>

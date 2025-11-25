@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using BcaEttvCore;
 
 namespace BcaEttv
@@ -9,17 +11,15 @@ namespace BcaEttv
     {
         public EttvModelComponent()
           : base("EttvModel", "EM",
-                 "Create an ETTV Model from surfaces and export settings",
+                 "Create an ETTV Model from surfaces (export deferred)",
                  "BcaEttv", "Model Setup")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddTextParameter("ProjectName", "PN", "Override EttvModel.ProjectName", GH_ParamAccess.item);
+            pManager.AddTextParameter("Version", "V", "Override EttvModel.Version", GH_ParamAccess.item);
             pManager.AddGenericParameter("EttvSurfaces", "S", "List of EttvSurface objects", GH_ParamAccess.list);
-            pManager.AddBooleanParameter("Reorder", "R", "Reorder surfaces for visualization", GH_ParamAccess.item, false);
-            pManager.AddBooleanParameter("WriteEtvFile", "W", "Write .etv file to disk", GH_ParamAccess.item, false);
-
-            // Make all inputs optional to avoid yellow warnings
             for (int i = 0; i < pManager.ParamCount; i++)
                 pManager[i].Optional = true;
         }
@@ -27,25 +27,48 @@ namespace BcaEttv
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddTextParameter("Status", "S", "Operation status and messages", GH_ParamAccess.item);
-            pManager.AddGenericParameter("EttvModel", "M", "EttvModel object (not implemented)", GH_ParamAccess.item);
+            pManager.AddGenericParameter("EttvModel", "M", "EttvModel object", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // Placeholder implementation
+            string projectName = null;
+            string version = null;
+            var rawSurfaces = new List<object>();
+
+            DA.GetData(0, ref projectName);
+            DA.GetData(1, ref version);
+            DA.GetDataList(2, rawSurfaces);
+
             var surfaces = new List<EttvSurface>();
-            bool reorder = false;
-            bool writeFile = false;
+            foreach (var item in rawSurfaces)
+            {
+                object v = item;
+                if (v is IGH_Goo goo)
+                    v = (goo as GH_ObjectWrapper)?.Value ?? goo.ScriptVariable();
 
-            // Get inputs (optional)
-            DA.GetDataList(0, surfaces);
-            DA.GetData(1, ref reorder);
-            DA.GetData(2, ref writeFile);
+                if (v is EttvSurface s && v.GetType().Assembly == typeof(EttvSurface).Assembly)
+                    surfaces.Add(s);
+            }
 
-            // TODO: Implement model creation and file writing
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "EttvModel: Implementation pending");
-            DA.SetData(0, "Model creation not implemented");
-            DA.SetData(1, null); // EttvModel placeholder
+            if (surfaces.Count == 0)
+            {
+                DA.SetData(0, "No valid EttvSurface objects provided.");
+                DA.SetData(1, null);
+                return;
+            }
+
+            var model = new EttvModel(surfaces);
+
+            if (!string.IsNullOrWhiteSpace(projectName))
+                model.ProjectName = projectName;
+            if (!string.IsNullOrWhiteSpace(version))
+                model.Version = version;
+
+            string status = $"EttvModel created: {model.ProjectName} v{model.Version}\nSurfaces: {model.Surfaces.Count}";
+
+            DA.SetData(0, status);
+            DA.SetData(1, model);
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
@@ -56,7 +79,9 @@ namespace BcaEttv
             {
                 var asm = System.Reflection.Assembly.GetExecutingAssembly();
                 using var stream = asm.GetManifestResourceStream("BcaEttv.Icons.EttvModel.png");
+#pragma warning disable CA1416
                 return stream is null ? null : new System.Drawing.Bitmap(stream);
+#pragma warning restore CA1416
             }
         }
 

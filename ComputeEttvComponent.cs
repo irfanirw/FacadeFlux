@@ -1,5 +1,6 @@
 using System;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using BcaEttvCore;
 
 namespace BcaEttv
@@ -24,26 +25,67 @@ namespace BcaEttv
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("EttvModel", "M", "Computed EttvModel object", GH_ParamAccess.item);
-            pManager.AddNumberParameter("EttvValue", "V", "Computed ETTV value", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("Pass", "P", "Whether ETTV passes compliance threshold", GH_ParamAccess.item);
+            pManager.AddTextParameter("Summary", "S", "Human readable ETTV report", GH_ParamAccess.item);
+            pManager.AddNumberParameter("EttvValue", "V", "Overall average ETTV value", GH_ParamAccess.item);
+            pManager.AddGenericParameter("EttvResult", "R", "Computed EttvModelResult", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            // Placeholder implementation
-            EttvModel model = null;
+            object rawModel = null;
             bool runComputation = false;
 
-            // Get inputs (optional)
-            DA.GetData(0, ref model);
+            DA.GetData(0, ref rawModel);
             DA.GetData(1, ref runComputation);
 
-            // TODO: Implement ETTV computation
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "ComputeEttv: Implementation pending");
-            DA.SetData(0, model);         // Return input model unchanged for now
-            DA.SetData(1, 0.0);           // Placeholder ETTV value
-            DA.SetData(2, false);         // Placeholder pass status
+            var model = UnwrapModel(rawModel);
+            if (model == null)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No EttvModel provided.");
+                DA.SetData(0, "No EttvModel provided.");
+                DA.SetData(1, double.NaN);
+                DA.SetData(2, null);
+                return;
+            }
+
+            if (!runComputation)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Enable RunComputation to evaluate ETTV.");
+                DA.SetData(0, "Computation skipped.");
+                DA.SetData(1, double.NaN);
+                DA.SetData(2, null);
+                return;
+            }
+
+            // Compute per-surface heat gain before aggregating model results
+            if (model.Surfaces != null)
+            {
+                foreach (var surface in model.Surfaces)
+                    surface?.ComputeHeatGain();
+            }
+
+            var result = EttvModelCalculator.Calculate(model);
+            DA.SetData(0, result.ResultSummary);
+            DA.SetData(1, result.OverallAverageEttv);
+            DA.SetData(2, result);
+        }
+
+        private static EttvModel UnwrapModel(object raw)
+        {
+            if (raw is EttvModel model)
+                return model;
+
+            if (raw is GH_ObjectWrapper wrapper)
+                return wrapper.Value as EttvModel;
+
+            if (raw is IGH_Goo goo)
+            {
+                var scriptValue = goo.ScriptVariable();
+                if (scriptValue is EttvModel scriptModel)
+                    return scriptModel;
+            }
+
+            return null;
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;

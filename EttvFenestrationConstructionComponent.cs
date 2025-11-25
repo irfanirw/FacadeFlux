@@ -73,7 +73,7 @@ namespace BcaEttv
                 Id = id ?? string.Empty,
                 Name = name ?? string.Empty,
                 EttvMaterials = materials,
-                Sc2 = 1.0 // Default value
+                Sc2 = 1.0 // default unless explicitly set elsewhere
             };
 
             // Compute U-value from materials if any
@@ -82,9 +82,10 @@ namespace BcaEttv
 
             // Assign SC input to Sc1 property
             if (!double.IsNaN(sc))
-            {
                 fen.Sc1 = sc;
-            }
+
+            // Ensure ScTotal is set (Sc1 * Sc2, with Sc2 defaulting to 1.0)
+            fen.ScTotal = fen.Sc1 * (fen.Sc2 == 0 ? 1.0 : fen.Sc2);
 
             // Output as base class (EttvConstruction)
             DA.SetData(0, (EttvConstruction)fen);
