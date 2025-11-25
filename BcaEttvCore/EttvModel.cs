@@ -20,6 +20,7 @@ namespace BcaEttvCore
             }
         }
         public EttvComputationResult ComputationResult { get; set; }
+        public RetvComputationResult RetvResult { get; set; }
 
         public EttvModel() { }
 

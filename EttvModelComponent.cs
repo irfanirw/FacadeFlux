@@ -9,6 +9,18 @@ namespace BcaEttv
 {
     public class EttvModelComponent : GH_Component
     {
+        private static readonly HashSet<string> MainOrientationKeys = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "N", "NORTH",
+            "NE", "NORTHEAST",
+            "E", "EAST",
+            "SE", "SOUTHEAST",
+            "S", "SOUTH",
+            "SW", "SOUTHWEST",
+            "W", "WEST",
+            "NW", "NORTHWEST"
+        };
+
         public EttvModelComponent()
           : base("EttvModel", "EM",
                  "Create an ETTV Model from surfaces (export deferred)",
@@ -61,7 +73,17 @@ namespace BcaEttv
                 return;
             }
 
-            var model = new EttvModel(surfaces);
+            var filteredSurfaces = surfaces.Where(IsMainOrientationSurface).ToList();
+            int filteredOut = surfaces.Count - filteredSurfaces.Count;
+
+            if (filteredSurfaces.Count == 0)
+            {
+                DA.SetData(0, "No valid EttvSurface objects provided after filtering invalid orientations.");
+                DA.SetData(1, null);
+                return;
+            }
+
+            var model = new EttvModel(filteredSurfaces);
 
             if (!double.IsNaN(angleToNorth))
             {
@@ -79,6 +101,8 @@ namespace BcaEttv
                 model.Version = version;
 
             string status = $"EttvModel created: {model.ProjectName} v{model.Version}\nSurfaces: {model.Surfaces.Count}";
+            if (filteredOut > 0)
+                status += $"\nFiltered out {filteredOut} surface(s) with unsupported orientation.";
 
             DA.SetData(0, status);
             DA.SetData(1, model);
@@ -99,5 +123,24 @@ namespace BcaEttv
         }
 
         public override Guid ComponentGuid => new Guid("BBA8E894-9193-4563-8A4F-E4D197778691");
+
+        private static bool IsMainOrientationSurface(EttvSurface surface)
+        {
+            if (surface?.Orientation?.Name is null)
+                return false;
+
+            var key = NormalizeOrientationKey(surface.Orientation.Name);
+            return key != null && MainOrientationKeys.Contains(key);
+        }
+
+        private static string NormalizeOrientationKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            return value.Replace(" ", string.Empty)
+                        .Replace("-", string.Empty)
+                        .ToUpperInvariant();
+        }
     }
 }
