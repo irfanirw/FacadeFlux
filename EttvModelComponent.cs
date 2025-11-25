@@ -20,6 +20,7 @@ namespace BcaEttv
             pManager.AddTextParameter("ProjectName", "PN", "Override EttvModel.ProjectName", GH_ParamAccess.item);
             pManager.AddTextParameter("Version", "V", "Override EttvModel.Version", GH_ParamAccess.item);
             pManager.AddGenericParameter("EttvSurfaces", "S", "List of EttvSurface objects", GH_ParamAccess.list);
+            pManager.AddNumberParameter("AngleToNorth", "A", "Assign to EttvOrientation.AngleToNorth for all surfaces", GH_ParamAccess.item);
             for (int i = 0; i < pManager.ParamCount; i++)
                 pManager[i].Optional = true;
         }
@@ -35,10 +36,12 @@ namespace BcaEttv
             string projectName = null;
             string version = null;
             var rawSurfaces = new List<object>();
+            double angleToNorth = double.NaN;
 
             DA.GetData(0, ref projectName);
             DA.GetData(1, ref version);
             DA.GetDataList(2, rawSurfaces);
+            DA.GetData(3, ref angleToNorth);
 
             var surfaces = new List<EttvSurface>();
             foreach (var item in rawSurfaces)
@@ -59,6 +62,16 @@ namespace BcaEttv
             }
 
             var model = new EttvModel(surfaces);
+
+            if (!double.IsNaN(angleToNorth))
+            {
+                foreach (var surface in model.Surfaces)
+                {
+                    surface.Orientation ??= new EttvOrientation();
+                    surface.Orientation.AngleToNorth = angleToNorth;
+                    surface.Orientation.AssignOrientation();
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(projectName))
                 model.ProjectName = projectName;

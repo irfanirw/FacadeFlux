@@ -48,8 +48,10 @@ namespace BcaEttvCore
                 return;
             }
 
-            double computedAngle = Math.Atan2(Normal.X, Normal.Y) * 180.0 / Math.PI;
-            double angle = NormalizeAngle(double.IsNaN(AngleToNorth) ? computedAngle : AngleToNorth);
+            double angle = Math.Atan2(Normal.X, Normal.Y) * 180.0 / Math.PI;
+            if (!double.IsNaN(AngleToNorth))
+                angle -= AngleToNorth;
+            angle = NormalizeAngle(angle);
 
             if (angle >= 337.5 || angle < 22.5)
             {
