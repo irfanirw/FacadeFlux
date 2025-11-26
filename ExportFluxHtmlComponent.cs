@@ -220,17 +220,7 @@ Validation test case report can be found here: [Insert URL]
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                var asm = System.Reflection.Assembly.GetExecutingAssembly();
-                using var stream = asm.GetManifestResourceStream("FacadeFlux.Icons.ComputeEttv.png");
-#pragma warning disable CA1416
-                return stream is null ? null : new System.Drawing.Bitmap(stream);
-#pragma warning restore CA1416
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
 
         public override Guid ComponentGuid => new Guid("D63F35B9-0F6A-4B19-9E78-8B4D1C8F7B4D");
     }

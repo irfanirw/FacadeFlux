@@ -94,15 +94,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                var asm = System.Reflection.Assembly.GetExecutingAssembly();
-                using var stream = asm.GetManifestResourceStream("FacadeFlux.Icons.ComputeEttv.png");
-                return stream is null ? null : new System.Drawing.Bitmap(stream);
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
 
         public override Guid ComponentGuid => new Guid("0F9C2D45-85B2-4771-B376-EF5E26F8F6A2");
     }

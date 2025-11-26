@@ -107,19 +107,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                // Load embedded icon from assembly resources
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                using var stream = assembly.GetManifestResourceStream("FacadeFlux.Icons.FluxMaterial.png");
-                if (stream == null) return null;
-#pragma warning disable CA1416 // Validate platform compatibility
-                return new System.Drawing.Bitmap(stream);
-#pragma warning restore CA1416 // Validate platform compatibility
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxMaterial.png");
 
         public override Guid ComponentGuid => new Guid("a7f3d9e5-1b6a-4c2b-9f58-2a6d5e8b3c77");
     }
