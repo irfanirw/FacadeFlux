@@ -6,7 +6,11 @@ namespace BcaEttvCore
 {
     public static class EttvModelCalculator
     {
-        public static EttvModelResult Calculate(EttvModel model)
+        public static EttvModelResult Calculate(
+            EttvModel model,
+            double wallConductanceCoefficient = 12.0,
+            double fenestrationConductanceCoefficient = 3.4,
+            double solarGainCoefficient = 211.0)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -68,10 +72,10 @@ namespace BcaEttvCore
 
                 double cf = orientation.Cf <= 0 ? 1.0 : orientation.Cf;
 
-                double etTvValue = gross > 0
-                    ? (12.0 * (1.0 - wwr) * wallU)                  // Opaque conduction
-                      + (3.4 * wwr * fenestrationU * sc)            // Fenestration conduction + shading coefficient
-                      + (211.0 * wwr * cf)                          // Solar factor adjusted by correction factor
+                                double etTvValue = gross > 0
+                                        ? (wallConductanceCoefficient * (1.0 - wwr) * wallU)
+                                            + (fenestrationConductanceCoefficient * wwr * fenestrationU * sc)
+                                            + (solarGainCoefficient * wwr * cf)
                     : 0.0;
 
                 orientationResult.AverageHeatGain = etTvValue;
