@@ -6,7 +6,11 @@ namespace BcaEttvCore
 {
     public static class RetvModelCalculator
     {
-        public static RetvModelResult Calculate(EttvModel model)
+        public static RetvModelResult Calculate(
+            EttvModel model,
+            double wallConductanceCoefficient = 3.4,
+            double fenestrationConductanceCoefficient = 1.3,
+            double solarGainCoefficient = 58.6)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -68,10 +72,10 @@ namespace BcaEttvCore
 
                 double cf = orientation.Cf <= 0 ? 1.0 : orientation.Cf;
 
-                double retvValue = gross > 0
-                    ? (12.0 * wallU * (orientationResult.WallArea / gross))
-                      + (3.4 * fenestrationU * (orientationResult.WindowArea / gross))
-                      + (0.305 * cf * sc * (orientationResult.WindowArea / gross))
+                                double retvValue = gross > 0
+                                        ? (wallConductanceCoefficient * wallU * (orientationResult.WallArea / gross))
+                                            + (fenestrationConductanceCoefficient * fenestrationU * (orientationResult.WindowArea / gross))
+                                            + (solarGainCoefficient * cf * sc * (orientationResult.WindowArea / gross))
                     : 0.0;
 
                 orientationResult.AverageRetv = retvValue;

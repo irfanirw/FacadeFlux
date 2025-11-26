@@ -24,17 +24,17 @@ namespace BcaEttvCore
         /// <summary>
         /// Coefficient for opaque wall heat transmission (W/m²K) factor in the RETV equation.
         /// </summary>
-        public double WallConductanceCoefficient { get; set; } = 12.0;
+        public double WallConductanceCoefficient { get; set; } = 3.4;
 
         /// <summary>
         /// Coefficient for fenestration heat transmission (W/m²K) factor in the RETV equation.
         /// </summary>
-        public double FenestrationConductanceCoefficient { get; set; } = 3.4;
+        public double FenestrationConductanceCoefficient { get; set; } = 1.3;
 
         /// <summary>
         /// Coefficient for solar gain term in the RETV equation.
         /// </summary>
-        public double SolarGainCoefficient { get; set; } = 0.305;
+        public double SolarGainCoefficient { get; set; } = 58.6;
 
         private static readonly Dictionary<string, double> CoolingFactors = new(StringComparer.OrdinalIgnoreCase)
         {
