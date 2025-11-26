@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "k+mAxgKpeWk=",
+  "dgSpecHash": "9RqBZxqB18M=",
   "success": true,
-  "projectFilePath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
+  "projectFilePath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
   "expectedPackageFiles": [
     "/Users/irfan/.nuget/packages/microsoft.bcl.asyncinterfaces/9.0.10/microsoft.bcl.asyncinterfaces.9.0.10.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.3/microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
@@ -23,21 +23,12 @@
   ],
   "logs": [
     {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
-      "targetGraphs": []
-    },
-    {
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'RhinoCommon 8.0.23304.9001' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
-      "projectPath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
+      "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
       "warningLevel": 1,
-      "filePath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
+      "filePath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
       "libraryId": "RhinoCommon",
       "targetGraphs": [
         "net7.0"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rW5xDkMZrS8=",
+  "dgSpecHash": "C7z/lZNNHeU=",
   "success": true,
-  "projectFilePath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFlux.csproj",
+  "projectFilePath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFlux.csproj",
   "expectedPackageFiles": [
     "/Users/irfan/.nuget/packages/grasshopper/8.0.23304.9001/grasshopper.8.0.23304.9001.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.bcl.asyncinterfaces/9.0.10/microsoft.bcl.asyncinterfaces.9.0.10.nupkg.sha512",
@@ -28,15 +28,5 @@
     "/Users/irfan/.nuget/packages/microsoft.windowsdesktop.app.ref/7.0.20/microsoft.windowsdesktop.app.ref.7.0.20.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.20/microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFlux.csproj",
-      "warningLevel": 1,
-      "filePath": "/Users/irfan/Documents/Learn/GitHub/BcaEttv/FacadeFlux.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }
