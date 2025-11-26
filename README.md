@@ -33,18 +33,18 @@ Example usage:
 
 ```csharp
 var mat = new EttvMat { Name = "Concrete", Thickness = 0.2, ThermalConductivity = 1.4 };
-var construction = new EttvOpaqueConstruction { Layers = new List<EttvMat> { mat } };
+var construction = new FluxOpaqueConstruction { Layers = new List<EttvMat> { mat } };
 double uValue = construction.CalculateU(new List<EttvMat> { mat });
 ```
 
 ## 📁 Project Structure
 
 - `EttvMat`: Defines material properties
-- `EttvConstruction`: Abstract base for construction types
-- `EttvOpaqueConstruction` / `EttvFenestrationConstruction`: Specialized implementations
+- `FluxConstruction`: Abstract base for construction types
+- `FluxOpaqueConstruction` / `FluxFenestrationConstruction`: Specialized implementations
 - `EttvSrf`: Represents building surfaces with geometry and heat gain logic
-- `EttvOrientation`: Handles orientation vectors and correction factors
-- `EttvModel`: Aggregates all components for full ETTV simulation
+- `FluxOrientation`: Handles orientation vectors and correction factors
+- `FluxModel`: Aggregates all components for full ETTV simulation
 
 ## 👥 Contributors
 

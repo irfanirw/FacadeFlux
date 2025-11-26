@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = BcaEttvCore
+build_property.ProjectDir = /Users/irfan/Documents/Learn/GitHub/BcaEttv/BcaEttvCore/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

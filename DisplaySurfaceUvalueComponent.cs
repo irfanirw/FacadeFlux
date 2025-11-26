@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
-using BcaEttvCore;
+using FacadeFluxCore;
 
-namespace BcaEttv
+namespace FacadeFlux
 {
     public class DisplaySurfaceUvalueComponent : GH_Component
     {
         public DisplaySurfaceUvalueComponent()
             : base("Display Surface U-value", "DSU",
-                   "Extract surface meshes and construction U-values from an EttvModel",
-                   "BcaEttv", "Post-processing")
+                   "Extract surface meshes and construction U-values from an FluxModel",
+                   "FacadeFlux", "Post-processing")
         {
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("EttvModel", "M", "EttvModel to inspect", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxModel", "M", "FluxModel to inspect", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddMeshParameter("Surfaces", "S", "EttvSurface geometries", GH_ParamAccess.list);
+            pManager.AddMeshParameter("Surfaces", "S", "FluxSurface geometries", GH_ParamAccess.list);
             pManager.AddNumberParameter("Uvalues", "U", "Surface construction U-values (W/m²K)", GH_ParamAccess.list);
         }
 
@@ -32,21 +32,21 @@ namespace BcaEttv
             object rawInput = null;
             if (!DA.GetData(0, ref rawInput) || rawInput is null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No EttvModel supplied.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No FluxModel supplied.");
                 return;
             }
 
             var model = UnwrapModel(rawInput);
             if (model is null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid EttvModel.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid FluxModel.");
                 return;
             }
 
             var meshes = new List<Mesh>();
             var uvalues = new List<double>();
 
-            var surfaces = model.Surfaces ?? new List<EttvSurface>();
+            var surfaces = model.Surfaces ?? new List<FluxSurface>();
             foreach (var surface in surfaces)
             {
                 if (surface == null || surface.Geometry == null)
@@ -57,24 +57,24 @@ namespace BcaEttv
             }
 
             if (meshes.Count == 0)
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Model contains no valid EttvSurface geometry.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Model contains no valid FluxSurface geometry.");
 
             DA.SetDataList(0, meshes);
             DA.SetDataList(1, uvalues);
         }
 
-        private static EttvModel UnwrapModel(object value)
+        private static FluxModel UnwrapModel(object value)
         {
-            if (value is EttvModel model)
+            if (value is FluxModel model)
                 return model;
 
             if (value is IGH_Goo goo)
             {
-                if (goo is GH_ObjectWrapper wrapper && wrapper.Value is EttvModel wrapped)
+                if (goo is GH_ObjectWrapper wrapper && wrapper.Value is FluxModel wrapped)
                     return wrapped;
 
                 var scriptValue = goo.ScriptVariable();
-                if (scriptValue is EttvModel scriptModel)
+                if (scriptValue is FluxModel scriptModel)
                     return scriptModel;
             }
 
