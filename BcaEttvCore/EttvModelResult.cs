@@ -99,6 +99,26 @@ namespace BcaEttvCore
 
                     sb.AppendLine($"<tr><th colspan=\"2\">{HtmlEncode(lines[0])}</th></tr>");
 
+                    var breakdownTable = new StringBuilder();
+                    var hasBreakdownRows = false;
+
+                    void FlushBreakdownTable()
+                    {
+                        if (!hasBreakdownRows)
+                            return;
+
+                        sb.AppendLine("<tr><td colspan=\"2\">");
+                        sb.AppendLine("<table>");
+                        sb.AppendLine("<tbody>");
+                        sb.Append(breakdownTable.ToString());
+                        sb.AppendLine("</tbody>");
+                        sb.AppendLine("</table>");
+                        sb.AppendLine("</td></tr>");
+
+                        breakdownTable.Clear();
+                        hasBreakdownRows = false;
+                    }
+
                     for (int i = 1; i < lines.Length; i++)
                     {
                         var line = lines[i].Trim();
@@ -107,11 +127,28 @@ namespace BcaEttvCore
 
                         var parts = line.Split(new[] { ':' }, 2);
                         if (parts.Length == 2)
+                        {
+                            FlushBreakdownTable();
                             AppendRow(sb, parts[0].Trim(), parts[1].Trim());
+                        }
+                        else if (IsBreakdownHeader(line))
+                        {
+                            AppendBreakdownHeaderRow(breakdownTable, line);
+                            hasBreakdownRows = true;
+                        }
+                        else if (line.Contains(","))
+                        {
+                            AppendCommaSeparatedRow(breakdownTable, line);
+                            hasBreakdownRows = true;
+                        }
                         else
+                        {
+                            FlushBreakdownTable();
                             AppendFullRow(sb, line);
+                        }
                     }
 
+                    FlushBreakdownTable();
                     sb.AppendLine("<tr><td colspan=\"2\"><hr/></td></tr>");
                 }
 
@@ -134,6 +171,46 @@ namespace BcaEttvCore
         {
             sb.AppendLine("<tr>");
             sb.AppendLine($"<td colspan=\"2\">{HtmlEncode(content)}</td>");
+            sb.AppendLine("</tr>");
+        }
+
+        private static void AppendCommaSeparatedRow(StringBuilder sb, string content)
+        {
+            var cells = content.Split(',');
+            if (cells.Length == 0)
+            {
+                AppendFullRow(sb, content);
+                return;
+            }
+
+            var useHeaderCells = cells[0].Trim().Equals("ID", StringComparison.OrdinalIgnoreCase);
+
+            sb.AppendLine("<tr>");
+            foreach (var cell in cells)
+            {
+                var value = HtmlEncode(cell.Trim());
+                if (useHeaderCells)
+                    sb.AppendLine($"<th>{value}</th>");
+                else
+                    sb.AppendLine($"<td>{value}</td>");
+            }
+            sb.AppendLine("</tr>");
+        }
+
+        private static bool IsBreakdownHeader(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            var trimmed = line.Trim();
+            return trimmed.Equals("Opaque Construction", StringComparison.OrdinalIgnoreCase)
+                || trimmed.Equals("Fenestration Construction", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void AppendBreakdownHeaderRow(StringBuilder sb, string title)
+        {
+            sb.AppendLine("<tr>");
+            sb.AppendLine($"<th colspan=\"10\" style=\"text-align:left;\">{HtmlEncode(title)}</th>");
             sb.AppendLine("</tr>");
         }
 

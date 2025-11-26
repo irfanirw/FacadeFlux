@@ -75,6 +75,9 @@ namespace BcaEttvCore
                 .ThenBy(x => x.NameKey, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
+            var addedOpaqueHeader = false;
+            var addedFenestrationHeader = false;
+
             foreach (var entry in sorted)
             {
                 var construction = entry.Construction;
@@ -91,10 +94,24 @@ namespace BcaEttvCore
                 var name = construction.Name ?? "Unnamed";
                 if (construction is EttvOpaqueConstruction)
                 {
+                    if (!addedOpaqueHeader)
+                    {
+                        sb.AppendLine("Opaque Construction");
+                        sb.AppendLine("ID, Description, Area, U-Value (W/m²K), 12 x Area x U-Value");
+                        addedOpaqueHeader = true;
+                    }
+
                     sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, 12 * {area:0.###} * {construction.Uvalue:0.###}");
                 }
                 else if (construction is EttvFenestrationConstruction fen)
                 {
+                    if (!addedFenestrationHeader)
+                    {
+                        sb.AppendLine("Fenestration Construction");
+                        sb.AppendLine("ID, Description, Area, U-Value (W/m²K), SC, 3.4 x Area x U-Value, 211 x Area x SC x CF");
+                        addedFenestrationHeader = true;
+                    }
+
                     double scTotal = fen.ScTotal > 0 ? fen.ScTotal : (fen.Sc1 > 0 ? fen.Sc1 : 1d) * (fen.Sc2 > 0 ? fen.Sc2 : 1d);
                     double cf = Orientation?.Cf ?? 0d;
                     sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, {scTotal:0.###}, 3.4 * {area:0.###} * {construction.Uvalue:0.###}, 211 * {area:0.###} * {scTotal:0.###} * {cf:0.###}");
