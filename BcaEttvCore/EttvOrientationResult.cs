@@ -101,7 +101,8 @@ namespace BcaEttvCore
                         addedOpaqueHeader = true;
                     }
 
-                    sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, 12 * {area:0.###} * {construction.Uvalue:0.###}");
+                    var opaqueHeatGain = 12d * area * construction.Uvalue;
+                    sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, {opaqueHeatGain:0.###}");
                 }
                 else if (construction is EttvFenestrationConstruction fen)
                 {
@@ -114,7 +115,9 @@ namespace BcaEttvCore
 
                     double scTotal = fen.ScTotal > 0 ? fen.ScTotal : (fen.Sc1 > 0 ? fen.Sc1 : 1d) * (fen.Sc2 > 0 ? fen.Sc2 : 1d);
                     double cf = Orientation?.Cf ?? 0d;
-                    sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, {scTotal:0.###}, 3.4 * {area:0.###} * {construction.Uvalue:0.###}, 211 * {area:0.###} * {scTotal:0.###} * {cf:0.###}");
+                    var conductiveGain = 3.4d * area * construction.Uvalue;
+                    var solarGain = 211d * area * scTotal * cf;
+                    sb.AppendLine($"{id}, {name}, {area:0.###} m², {construction.Uvalue:0.###}, {scTotal:0.###}, {conductiveGain:0.###}, {solarGain:0.###}");
                 }
             }
         }
