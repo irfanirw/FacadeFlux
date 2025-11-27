@@ -11,7 +11,7 @@ namespace FacadeFlux
     {
         public FluxUValueComponent()
           : base("FluxUValueCalculator", "FU",
-                 "Calculate U-value from a list of Flux materials",
+                 "Calculate U-value from a list of FluxMaterials",
                  "FacadeFlux", "Geometry & Inputs")
         { }
 

@@ -7,10 +7,10 @@ using FacadeFluxCore;
 
 namespace FacadeFlux
 {
-    public class ReadFluxSurfaceResultComponent : GH_Component
+    public class FluxModelSurfaceHeatGainComponent : GH_Component
     {
-        public ReadFluxSurfaceResultComponent()
-            : base("Read Ettv Surface Result", "RESR",
+        public FluxModelSurfaceHeatGainComponent()
+            : base("FluxModelSurfaceHeatGain", "FMSHG",
                    "Extract surfaces and heat gain values from an EttvModelResult",
                    "FacadeFlux", "Post-processing")
         {
