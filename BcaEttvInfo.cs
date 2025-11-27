@@ -3,11 +3,11 @@ using System.Drawing;
 using Grasshopper;
 using Grasshopper.Kernel;
 
-namespace BcaEttv
+namespace FacadeFlux
 {
-  public class BcaEttvInfo : GH_AssemblyInfo
+  public class FacadeFluxInfo : GH_AssemblyInfo
   {
-    public override string Name => "BcaEttv Info";
+    public override string Name => "FacadeFlux Info";
 
     //Return a 24x24 pixel bitmap to represent this GHA library.
     public override Bitmap Icon => null;

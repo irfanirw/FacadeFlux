@@ -8,7 +8,7 @@
       "args": [
         "build",
         "-clp:NoSummary",
-        "${workspaceFolder}/BcaEttv.csproj"
+        "${workspaceFolder}/FacadeFlux.csproj"
       ],
       "problemMatcher": "$msCompile",
       "presentation": {

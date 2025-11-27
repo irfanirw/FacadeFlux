@@ -1,21 +1,21 @@
 using System;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
-using BcaEttvCore;
+using FacadeFluxCore;
 
-namespace BcaEttv
+namespace FacadeFlux
 {
     public class ComputeEttvComponent : GH_Component
     {
         public ComputeEttvComponent()
           : base("ComputeEttv", "CE",
                  "Compute ETTV values for the model",
-                 "BcaEttv", "Calculations")
+                 "FacadeFlux", "Calculations")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("EttvModel", "M", "EttvModel object", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxModel", "M", "FluxModel object", GH_ParamAccess.item);
             pManager.AddBooleanParameter("RunComputation", "R", "Run ETTV computation", GH_ParamAccess.item, false);
 
             // Make all inputs optional to avoid yellow warnings
@@ -41,8 +41,8 @@ namespace BcaEttv
             var model = UnwrapModel(rawModel);
             if (model == null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No EttvModel provided.");
-                DA.SetData(0, "No EttvModel provided.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No FluxModel provided.");
+                DA.SetData(0, "No FluxModel provided.");
                 DA.SetData(1, double.NaN);
                 DA.SetData(2, null);
                 return;
@@ -64,24 +64,24 @@ namespace BcaEttv
                     surface?.ComputeHeatGain();
             }
 
-            var result = EttvModelCalculator.Calculate(model);
+            var result = FluxModelCalculator.Calculate(model);
             DA.SetData(0, result.ResultSummary);
             DA.SetData(1, result.OverallAverageEttv);
             DA.SetData(2, result);
         }
 
-        private static EttvModel UnwrapModel(object raw)
+        private static FluxModel UnwrapModel(object raw)
         {
-            if (raw is EttvModel model)
+            if (raw is FluxModel model)
                 return model;
 
             if (raw is GH_ObjectWrapper wrapper)
-                return wrapper.Value as EttvModel;
+                return wrapper.Value as FluxModel;
 
             if (raw is IGH_Goo goo)
             {
                 var scriptValue = goo.ScriptVariable();
-                if (scriptValue is EttvModel scriptModel)
+                if (scriptValue is FluxModel scriptModel)
                     return scriptModel;
             }
 
@@ -90,15 +90,7 @@ namespace BcaEttv
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                var asm = System.Reflection.Assembly.GetExecutingAssembly();
-                using var stream = asm.GetManifestResourceStream("BcaEttv.Icons.ComputeEttv.png");
-                return stream is null ? null : new System.Drawing.Bitmap(stream);
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
 
         public override Guid ComponentGuid => new Guid("C5F8A2D1-3E4B-4A5C-9D6E-7F8A9B0C1D2E");
     }

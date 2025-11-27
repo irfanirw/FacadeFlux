@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <!-- Select the framework(s) you wish to target. -->
+    <TargetFrameworks>net7.0-windows;net7.0;net48</TargetFrameworks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <TargetExt>.gha</TargetExt>
+    
+    <!-- Disable SDK assembly attribute generation -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    
+    <NoWarn>NU1701;NETSDK1086</NoWarn>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- Fix: use modern C# (for global usings) -->
+    <LangVersion>latest</LangVersion>
+
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!-- Specifies information for Assembly and Yak -->
+    <Version>1.0</Version>
+    <Title>FacadeFlux</Title>
+    <Company>Irfan Irwanuddin</Company>
+    <Description>FacadeFlux plugin for BCA Singapore ETTV Compliance</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons/FluxSurface.png" />
+    <EmbeddedResource Include="Icons/FluxConstruction.png" />
+    <EmbeddedResource Include="Icons/FluxOpaqueConstruction.png" />
+    <EmbeddedResource Include="Icons/FluxMaterial.png" />
+    <EmbeddedResource Include="Icons/FluxUValue.png" />
+    <EmbeddedResource Include="Icons/Sc2Generator.png" />
+    <EmbeddedResource Include="Icons/FluxFenestrationConstruction.png" />
+    <EmbeddedResource Include="Icons/FluxModel.png" />
+    <EmbeddedResource Include="Icons/ComputeEttv.png" />
+    <EmbeddedResource Include="Icons/DeconstructFluxConstruction.png" />
+    <EmbeddedResource Include="Icons/DeconstructFluxSurface.png" />
+    <EmbeddedResource Include="Icons/FluxMaterialDatabase.png" />
+    <EmbeddedResource Include="Icons/DeconstructFluxModel.png" />
+    <EmbeddedResource Include="Icons/DeconstructFluxMaterial.png" />
+    <EmbeddedResource Include="Icons/FluxExternalShading.png" />
+ 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="FacadeFluxCore/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="FacadeFluxCore/FacadeFluxCore.csproj" />
+  </ItemGroup>
+
+  <!-- For Windows only builds -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) or $(TargetFramework.StartsWith('net4'))">
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Reference WinForms for .NET 7.0 on macOS -->
+  <ItemGroup Condition="!($(TargetFramework.Contains('-windows')) or $(TargetFramework.StartsWith('net4')))">
+    <!-- Rhino 8.11 and later you can use this -->
+    <!-- <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" /> -->
+    
+    <!-- Rhino 8.10 and earlier -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" ExcludeAssets="all" GeneratePathProperty="true" />
+    <Reference Include="$(PkgMicrosoft_NETFramework_ReferenceAssemblies_net48)\build\.NETFramework\v4.8\System.Windows.Forms.dll" Private="False" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+</Project>

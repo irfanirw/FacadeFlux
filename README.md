@@ -1,64 +1,55 @@
+# FacadeFlux
 
-# BcaEttv
+FacadeFlux is a Grasshopper toolkit for BCA Singapore facade compliance workflows (ETTV and RETV). It wraps the core calculation library and a set of components that build facade models, calculate values, visualize construction types, and export lightweight reports.
 
-**Building Construction Authority Environmental Thermal Transfer Value (ETTV) Calculator**
+## Overview
+- Build facade materials and constructions (opaque and fenestration).
+- Generate FluxSurface geometry, orientations, and full FluxModel containers.
+- Compute ETTV/RETV via FluxModel calculators.
+- Visualize construction types directly in the Rhino viewport.
+- Export HTML summaries for sharing results.
 
-*From afterthought to algorithm — facade performance redefined*
+## Installation (from source)
+1. Clone this repository.
+2. Build `FacadeFlux.csproj` in Release for your target (e.g., `dotnet build -c Release -f net7.0-windows` on Windows or `-f net7.0` for cross-platform Grasshopper 8).
+3. Copy the generated `FacadeFlux.gha` from `bin/Release/<tfm>/` into your Grasshopper Libraries folder:
+   - Windows: `%AppData%\\Grasshopper\\Libraries`
+   - macOS: `~/Library/Application Support/McNeel/Rhinoceros/MacPlugIns/Grasshopper/Libraries`
+4. Restart Rhino/Grasshopper and look for the FacadeFlux tab.
 
-## 📦 Overview
-
-**BcaEttv** is a C# library designed to support ETTV calculations for building envelope components in compliance with Singapore’s BCA Green Mark requirements. It provides a structured object-oriented model for simulating heat gain through opaque and fenestration surfaces, enabling designers to evaluate compliance and optimize building performance.
-
-## 🧱 Features
-
-- Modular class architecture for:
-  - Opaque and fenestration constructions
-  - Surface geometry and orientation
-  - Material thermal properties
-- ETTV computation logic based on BCA formulas
-- Rhino.Geometry integration for mesh-based surface modeling
-- Extensible model for simulation and reporting
-
-## 🛠️ Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/irfanirw/BcaEttv.git
-```
-
-Open the solution in Visual Studio and restore NuGet packages.
-
-## 🚀 Usage
-
-Example usage:
+## Quick start (code)
+You can also consume the core library directly:
 
 ```csharp
-var mat = new EttvMat { Name = "Concrete", Thickness = 0.2, ThermalConductivity = 1.4 };
-var construction = new EttvOpaqueConstruction { Layers = new List<EttvMat> { mat } };
-double uValue = construction.CalculateU(new List<EttvMat> { mat });
+using FacadeFluxCore;
+
+var concrete = new FluxMaterial { Name = "Concrete", Thickness = 0.2, ThermalConductivity = 1.4 };
+var opaque = new FluxOpaqueConstruction { Name = "Wall", FluxMaterials = new() { concrete } };
+
+var surface = new FluxSurface
+{
+    Name = "North Facade",
+    Construction = opaque,
+    Orientation = new FluxOrientation { Name = "North" }
+};
+
+var model = new FluxModel(new() { surface });
+var etvvResult = FluxCalculator.CalculateEttv(model);
 ```
 
-## 📁 Project Structure
+## Component highlights
+- FluxMaterial / FluxMaterialDatabase: define and pick materials.
+- FluxOpaqueConstruction / FluxFenestrationConstruction: assemble constructions and U-values.
+- FluxSurface / FluxModel: build facade geometry collections.
+- ComputeETTV / ComputeRETV: run compliance calculations.
+- Display Flux Construction Type: viewport coloring by construction type.
+- Export Flux HTML: one-click HTML summary.
 
-- `EttvMat`: Defines material properties
-- `EttvConstruction`: Abstract base for construction types
-- `EttvOpaqueConstruction` / `EttvFenestrationConstruction`: Specialized implementations
-- `EttvSrf`: Represents building surfaces with geometry and heat gain logic
-- `EttvOrientation`: Handles orientation vectors and correction factors
-- `EttvModel`: Aggregates all components for full ETTV simulation
+## Project layout
+- `FacadeFluxCore/` – calculation library (ETTV/RETV, materials, constructions, surfaces, model utilities).
+- `*.cs` in root – Grasshopper component implementations and icons.
+- `Icons/` – embedded PNG assets.
+- `testFiles/` – sample data inputs.
 
-## 👥 Contributors
-
-- **Irfan Irwanuddin** – https://github.com/irfanirw
-- **Galuh Kresnadian Tedjawinata** – https://github.com/tedjawinata
-
-## 📄 License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## 🙌 Acknowledgements
-
-Inspired by BCA Green Mark guidelines and Rhino.Geometry for spatial modeling.
-
----
+## License
+License terms are not yet declared in this repository.
