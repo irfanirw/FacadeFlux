@@ -220,7 +220,7 @@ Validation test case report can be found here: [Insert URL]
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ExportFluxHtml.png");
 
         public override Guid ComponentGuid => new Guid("D63F35B9-0F6A-4B19-9E78-8B4D1C8F7B4D");
     }

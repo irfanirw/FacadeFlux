@@ -210,7 +210,7 @@ namespace FacadeFlux
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
-        protected override Bitmap Icon => null;
+        protected override Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.DisplayFluxConstructionType.png");
         public override Guid ComponentGuid => new Guid("7E2B9D99-5A1D-4F9B-92E0-FE72C5C5FC24");
     }
 }

@@ -32,20 +32,24 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Icons/FluxSurface.png" />
-    <EmbeddedResource Include="Icons/FluxConstruction.png" />
     <EmbeddedResource Include="Icons/FluxOpaqueConstruction.png" />
     <EmbeddedResource Include="Icons/FluxMaterial.png" />
     <EmbeddedResource Include="Icons/FluxUValue.png" />
     <EmbeddedResource Include="Icons/Sc2Generator.png" />
     <EmbeddedResource Include="Icons/FluxFenestrationConstruction.png" />
     <EmbeddedResource Include="Icons/FluxModel.png" />
-    <EmbeddedResource Include="Icons/ComputeEttv.png" />
+    <EmbeddedResource Include="Icons/ComputeFluxModel.png" />
     <EmbeddedResource Include="Icons/DeconstructFluxConstruction.png" />
     <EmbeddedResource Include="Icons/DeconstructFluxSurface.png" />
     <EmbeddedResource Include="Icons/FluxMaterialDatabase.png" />
     <EmbeddedResource Include="Icons/DeconstructFluxModel.png" />
     <EmbeddedResource Include="Icons/DeconstructFluxMaterial.png" />
     <EmbeddedResource Include="Icons/FluxExternalShading.png" />
+    <EmbeddedResource Include="Icons/ExportFluxHtml.png" />
+    <EmbeddedResource Include="Icons/DisplaySurfaceUvalue.png" />
+    <EmbeddedResource Include="Icons/FluxModelSurfaceHeatGain.png" />
+    <EmbeddedResource Include="Icons/DisplayFluxConstructionName.png" />
+    <EmbeddedResource Include="Icons/DisplayFluxConstructionType.png" />
  
   </ItemGroup>
 

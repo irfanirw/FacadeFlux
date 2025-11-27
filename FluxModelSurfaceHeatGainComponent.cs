@@ -11,14 +11,14 @@ namespace FacadeFlux
     {
         public FluxModelSurfaceHeatGainComponent()
             : base("FluxModelSurfaceHeatGain", "FMSHG",
-                   "Extract surfaces and heat gain values from an EttvModelResult",
+                   "Extract surfaces and heat gain values from an EttvModelResult or RetvModelResult",
                    "FacadeFlux", "3 :: Post-processing")
         {
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("EttvModelResult", "R", "Computed EttvModelResult", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxModelResult", "R", "Computed EttvModelResult or RetvModelResult", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -32,14 +32,14 @@ namespace FacadeFlux
             object rawResult = null;
             if (!DA.GetData(0, ref rawResult) || rawResult is null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No EttvModelResult supplied.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No result supplied.");
                 return;
             }
 
             var result = UnwrapResult(rawResult);
             if (result is null)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid EttvModelResult.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid EttvModelResult or RetvModelResult.");
                 return;
             }
 
@@ -61,19 +61,31 @@ namespace FacadeFlux
             DA.SetDataList(1, heatGains);
         }
 
-        private static EttvModelResult UnwrapResult(object value)
+        private static FluxModel UnwrapResult(object value)
         {
-            if (value is EttvModelResult modelResult)
-                return modelResult;
+            switch (value)
+            {
+                case EttvModelResult ettv:
+                    return ettv;
+                case RetvModelResult retv:
+                    return retv;
+            }
 
             if (value is IGH_Goo goo)
             {
-                if (goo is GH_ObjectWrapper wrapper && wrapper.Value is EttvModelResult wrapped)
-                    return wrapped;
+                if (goo is GH_ObjectWrapper wrapper)
+                {
+                    if (wrapper.Value is EttvModelResult wrappedEttv)
+                        return wrappedEttv;
+                    if (wrapper.Value is RetvModelResult wrappedRetv)
+                        return wrappedRetv;
+                }
 
                 var scriptValue = goo.ScriptVariable();
-                if (scriptValue is EttvModelResult scriptResult)
-                    return scriptResult;
+                if (scriptValue is EttvModelResult scriptEttv)
+                    return scriptEttv;
+                if (scriptValue is RetvModelResult scriptRetv)
+                    return scriptRetv;
             }
 
             return null;
@@ -81,13 +93,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                return null;
-            }
-        }
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxModelSurfaceHeatGain.png");
 
         public override Guid ComponentGuid => new Guid("CF7C3F3E-784A-4A9B-946A-2182C105D8AC");
     }

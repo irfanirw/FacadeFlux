@@ -130,7 +130,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.primary;
 
-        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeFluxModel.png");
 
         public override Guid ComponentGuid => new Guid("E139698A-094B-4B7E-B7C2-3C5D4B9BE8CB");
     }

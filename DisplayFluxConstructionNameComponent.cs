@@ -18,7 +18,7 @@ namespace FacadeFlux
         private readonly List<(Mesh mesh, Color color)> _previewMeshes = new();
 
         public DisplayFluxConstructionNameComponent()
-            : base("Display Flux Construction Names", "DCN",
+            : base("Display FluxConstruction Names", "DCN",
                    "Displays FluxSurface geometry colored by FluxConstruction.Name.",
                    "FacadeFlux", "4 :: Utilities")
         { }
@@ -276,7 +276,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
-        protected override Bitmap Icon => null;
+        protected override Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.DisplayFluxConstructionName.png");
 
         public override Guid ComponentGuid => new Guid("0D38C6C2-2E52-4BD5-9F0F-4E53A2E4F312");
     }

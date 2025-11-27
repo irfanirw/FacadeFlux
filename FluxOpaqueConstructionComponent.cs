@@ -82,7 +82,7 @@ namespace FacadeFlux
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
 
-        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxConstruction.png");
+        protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxOpaqueConstruction.png");
 
         public override Guid ComponentGuid => new Guid("8b6b8a2f-3f8f-4f7a-bf2c-9c5c2e7a4c11");
     }
