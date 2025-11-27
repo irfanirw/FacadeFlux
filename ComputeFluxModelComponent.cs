@@ -6,20 +6,21 @@ using FacadeFluxCore;
 
 namespace FacadeFlux
 {
-    public class ComputeRetvComponent : GH_Component
+    public class ComputeFluxModelComponent : GH_Component
     {
         private const double DefaultRetvLimit = 25.0;
 
-        public ComputeRetvComponent()
-          : base("ComputeRetv", "CR",
-                 "Compute RETV values for the model",
+        public ComputeFluxModelComponent()
+          : base("ComputeFluxModel", "CFM",
+                 "Compute ETTV or RETV values for the model",
                  "FacadeFlux", "Calculations")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("FluxModel", "M", "FluxModel object", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("RunComputation", "R", "Run RETV computation", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("RunComputation", "R", "Run computation", GH_ParamAccess.item, false);
+            pManager.AddIntegerParameter("ComputationType", "C", "Computation type: 0 = ETTV, 1 = RETV", GH_ParamAccess.item, 0);
 
             for (int i = 0; i < pManager.ParamCount; i++)
                 pManager[i].Optional = true;
@@ -27,18 +28,20 @@ namespace FacadeFlux
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddTextParameter("Summary", "S", "Human readable RETV report", GH_ParamAccess.item);
-            pManager.AddNumberParameter("RetvValue", "V", "Overall average RETV value", GH_ParamAccess.item);
-            pManager.AddGenericParameter("RetvResult", "R", "Computed RetvModelResult", GH_ParamAccess.item);
+            pManager.AddTextParameter("Summary", "S", "Human readable ETTV/RETV report", GH_ParamAccess.item);
+            pManager.AddNumberParameter("EttvValue", "V", "Overall average ETTV/RETV value", GH_ParamAccess.item);
+            pManager.AddGenericParameter("EttvResult", "R", "Computed EttvModelResult or RetvModelResult", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             object rawModel = null;
             bool runComputation = false;
+            int computationType = 0;
 
             DA.GetData(0, ref rawModel);
             DA.GetData(1, ref runComputation);
+            DA.GetData(2, ref computationType);
 
             var model = UnwrapModel(rawModel);
             if (model == null)
@@ -52,13 +55,46 @@ namespace FacadeFlux
 
             if (!runComputation)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Enable RunComputation to evaluate RETV.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Enable RunComputation to evaluate ETTV/RETV.");
                 DA.SetData(0, "Computation skipped.");
                 DA.SetData(1, double.NaN);
                 DA.SetData(2, null);
                 return;
             }
 
+            switch (computationType)
+            {
+                case 0:
+                    ComputeEttv(model, DA);
+                    break;
+                case 1:
+                    ComputeRetv(model, DA);
+                    break;
+                default:
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Invalid ComputationType. Use 0 for ETTV or 1 for RETV.");
+                    DA.SetData(0, "Invalid ComputationType supplied.");
+                    DA.SetData(1, double.NaN);
+                    DA.SetData(2, null);
+                    break;
+            }
+        }
+
+        private void ComputeEttv(FluxModel model, IGH_DataAccess DA)
+        {
+            if (model.Surfaces != null)
+            {
+                foreach (var surface in model.Surfaces)
+                    surface?.ComputeHeatGain();
+            }
+
+            var result = FluxModelCalculator.Calculate(model);
+            DA.SetData(0, result.ResultSummary);
+            DA.SetData(1, result.OverallAverageEttv);
+            DA.SetData(2, result);
+        }
+
+        private void ComputeRetv(FluxModel model, IGH_DataAccess DA)
+        {
             var result = RetvModelCalculator.Calculate(model);
             var pass = result.GrossArea > 0 ? result.OverallAverageRetv <= DefaultRetvLimit : (bool?)null;
             model.RetvResult = new RetvComputationResult(result.OverallAverageRetv, pass, DefaultRetvLimit)
@@ -96,6 +132,6 @@ namespace FacadeFlux
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
 
-        public override Guid ComponentGuid => new Guid("0F9C2D45-85B2-4771-B376-EF5E26F8F6A2");
+        public override Guid ComponentGuid => new Guid("E139698A-094B-4B7E-B7C2-3C5D4B9BE8CB");
     }
 }
