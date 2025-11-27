@@ -20,6 +20,7 @@ namespace FacadeFlux
             pManager.AddTextParameter("Id", "ID", "Construction identifier (string)", GH_ParamAccess.item);
             pManager.AddTextParameter("Name", "N", "Construction name", GH_ParamAccess.item);
             pManager.AddGenericParameter("Materials", "M", "List of FacadeFluxCore.FluxMaterial", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Uvalue", "U", "Predetermined U-value (overrides computed value)", GH_ParamAccess.item);
 
             // keep inputs optional to avoid yellow warnings
             for (int i = 0; i < pManager.ParamCount; i++)
@@ -37,10 +38,12 @@ namespace FacadeFlux
             string id = null;
             string name = null;
             var rawMaterials = new List<object>();
+            double overrideU = double.NaN;
 
             DA.GetData(0, ref id);
             DA.GetData(1, ref name);
             DA.GetDataList(2, rawMaterials);
+            DA.GetData(3, ref overrideU);
 
             // Collect only FacadeFluxCore.FluxMaterial
             var materials = new List<FluxMaterial>();
@@ -57,7 +60,7 @@ namespace FacadeFlux
             }
 
             // If nothing provided, return quietly
-            bool anyProvided = !string.IsNullOrWhiteSpace(id) || !string.IsNullOrEmpty(name) || materials.Count > 0;
+            bool anyProvided = !string.IsNullOrWhiteSpace(id) || !string.IsNullOrEmpty(name) || materials.Count > 0 || !double.IsNaN(overrideU);
             if (!anyProvided)
             {
                 DA.SetData(0, null);
@@ -66,6 +69,8 @@ namespace FacadeFlux
 
             // Compute U-value if materials are provided
             double u = materials.Count > 0 ? FluxUvalueCalculator.ComputeUValue(materials) : 0.0;
+            if (!double.IsNaN(overrideU))
+                u = overrideU;
 
             // Build opaque construction
             var opaque = new FluxOpaqueConstruction
