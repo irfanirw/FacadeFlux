@@ -11,7 +11,7 @@ namespace FacadeFlux
         public FluxExternalShadingComponent()
           : base("FluxExternalShading", "EES",
                  "Apply external shading coefficient (Sc2) to FluxSurface with fenestration",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)

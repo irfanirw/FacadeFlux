@@ -12,7 +12,7 @@ namespace FacadeFlux
         public DisplaySurfaceUvalueComponent()
             : base("Display Surface U-value", "DSU",
                    "Extract surface meshes and construction U-values from an FluxModel",
-                   "FacadeFlux", "Post-processing")
+                   "FacadeFlux", "3 :: Post-processing")
         {
         }
 

@@ -12,7 +12,7 @@ namespace FacadeFlux
         public ExportFluxHtmlComponent()
           : base("ExportFluxHtml", "EFH",
                  "Export ETTV/RETV results as an HTML table",
-                 "FacadeFlux", "Reporting")
+                 "FacadeFlux", "3 :: Post-processing")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -218,7 +218,7 @@ Validation test case report can be found here: [Insert URL]
 </html>";
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.ComputeEttv.png");
 

@@ -12,7 +12,7 @@ namespace FacadeFlux
         public FluxFenestrationConstructionComponent()
           : base("FluxFenestrationConstruction", "EFC",
                  "Create an ETTV Fenestration Construction",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -91,7 +91,7 @@ namespace FacadeFlux
             DA.SetData(0, (FluxConstruction)fen);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxFenestrationConstruction.png");
 

@@ -14,7 +14,7 @@ namespace FacadeFlux
         public DeconstructFluxSurfaceComponent()
           : base("Deconstruct FluxSurface", "DES",
                  "Deconstruct a list of FluxSurface objects",
-                 "FacadeFlux", "Utilities")
+                 "FacadeFlux", "4 :: Utilities")
         {
             // Disable preview by default
             this.Hidden = true;

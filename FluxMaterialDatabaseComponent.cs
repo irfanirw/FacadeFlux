@@ -57,7 +57,7 @@ namespace FacadeFlux
         public FluxMaterialDatabaseComponent()
           : base("FluxMaterialDatabase", "EMD",
                  "Select building material and get its thermal conductivity (k-value)",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -121,7 +121,7 @@ namespace FacadeFlux
             return base.Read(reader);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxMaterialDatabase.png");
 

@@ -10,7 +10,7 @@ namespace FacadeFlux
         public Sc2GeneratorComponent()
           : base("Sc2Generator", "SC2",
                  "Generate SC2 value for ETTV calculation",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -87,7 +87,7 @@ namespace FacadeFlux
             return null;
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.Sc2Generator.png");
 

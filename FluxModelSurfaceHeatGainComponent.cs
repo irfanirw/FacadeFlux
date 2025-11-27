@@ -12,7 +12,7 @@ namespace FacadeFlux
         public FluxModelSurfaceHeatGainComponent()
             : base("FluxModelSurfaceHeatGain", "FMSHG",
                    "Extract surfaces and heat gain values from an EttvModelResult",
-                   "FacadeFlux", "Post-processing")
+                   "FacadeFlux", "3 :: Post-processing")
         {
         }
 

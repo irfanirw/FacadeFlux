@@ -13,7 +13,7 @@ namespace FacadeFlux
         public ComputeFluxModelComponent()
           : base("ComputeFluxModel", "CFM",
                  "Compute ETTV or RETV values for the model",
-                 "FacadeFlux", "Calculations")
+                 "FacadeFlux", "2 :: Analysis")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -29,8 +29,8 @@ namespace FacadeFlux
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddTextParameter("Summary", "S", "Human readable ETTV/RETV report", GH_ParamAccess.item);
-            pManager.AddNumberParameter("EttvValue", "V", "Overall average ETTV/RETV value", GH_ParamAccess.item);
-            pManager.AddGenericParameter("EttvResult", "R", "Computed EttvModelResult or RetvModelResult", GH_ParamAccess.item);
+            pManager.AddNumberParameter("ThermalTransferValue", "V", "Overall average ETTV/RETV value (W/m²)", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxModelResult", "R", "Computed EttvModelResult or RetvModelResult", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

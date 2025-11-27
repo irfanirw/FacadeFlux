@@ -10,7 +10,7 @@ namespace FacadeFlux
         public DeconstructFluxMaterialComponent()
             : base("Deconstruct FluxMaterial", "DEM",
                    "Deconstruct an FluxMaterial into summary and properties",
-                   "FacadeFlux", "Utilities")
+                   "FacadeFlux", "4 :: Utilities")
         {
         }
 
@@ -74,7 +74,7 @@ namespace FacadeFlux
             return null;
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.DeconstructFluxMaterial.png");
 

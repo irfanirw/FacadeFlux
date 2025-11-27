@@ -12,7 +12,7 @@ namespace FacadeFlux
         public FluxUValueComponent()
           : base("FluxUValueCalculator", "FU",
                  "Calculate U-value from a list of FluxMaterials",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "2 :: Analysis")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

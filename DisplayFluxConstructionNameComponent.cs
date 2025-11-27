@@ -20,7 +20,7 @@ namespace FacadeFlux
         public DisplayFluxConstructionNameComponent()
             : base("Display Flux Construction Names", "DCN",
                    "Displays FluxSurface geometry colored by FluxConstruction.Name.",
-                   "FacadeFlux", "Utilities")
+                   "FacadeFlux", "4 :: Utilities")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)

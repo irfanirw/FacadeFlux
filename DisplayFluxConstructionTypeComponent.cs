@@ -20,7 +20,7 @@ namespace FacadeFlux
         public DisplayFluxConstructionTypeComponent()
             : base("Display Flux Construction Type", "DFT",
                    "Displays FluxSurface geometry colored by construction type (fenestration vs opaque).",
-                   "FacadeFlux", "Utilities")
+                   "FacadeFlux", "4 :: Utilities")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -209,7 +209,7 @@ namespace FacadeFlux
             }
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.tertiary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override Bitmap Icon => null;
         public override Guid ComponentGuid => new Guid("7E2B9D99-5A1D-4F9B-92E0-FE72C5C5FC24");
     }

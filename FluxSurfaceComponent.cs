@@ -12,7 +12,7 @@ namespace FacadeFlux
         public FluxSurfaceComponent()
           : base("FluxSurface", "ES",
                  "Create FluxSurface objects from Mesh or Brep geometry and an FluxConstruction",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

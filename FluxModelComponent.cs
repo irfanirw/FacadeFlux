@@ -24,7 +24,7 @@ namespace FacadeFlux
         public FluxModelComponent()
           : base("FluxModel", "EM",
                  "Create an ETTV Model from surfaces (export deferred)",
-                 "FacadeFlux", "Model Setup")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -108,7 +108,7 @@ namespace FacadeFlux
             DA.SetData(1, model);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.tertiary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxModel.png");
 

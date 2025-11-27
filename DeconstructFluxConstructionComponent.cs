@@ -12,7 +12,7 @@ namespace FacadeFlux
         public DeconstructFluxConstructionComponent()
           : base("Deconstruct FluxConstruction", "DEC",
                  "Deconstruct an FluxConstruction (Opaque or Fenestration) to a readable text",
-                 "FacadeFlux", "Utilities")
+                 "FacadeFlux", "4 :: Utilities")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

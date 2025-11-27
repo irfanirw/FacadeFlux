@@ -12,7 +12,7 @@ namespace FacadeFlux
         public FluxOpaqueConstructionComponent()
           : base("FluxOpaqueConstruction", "EOC",
                  "Create an FluxConstruction (opaque) from Id, Name and Materials",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
@@ -80,7 +80,7 @@ namespace FacadeFlux
             DA.SetData(0, (FluxConstruction)opaque);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => GH_Exposure.secondary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxConstruction.png");
 
