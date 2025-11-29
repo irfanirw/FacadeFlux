@@ -264,19 +264,29 @@ namespace FacadeFluxCore
 
             foreach (var construction in constructions)
             {
+                var hasMaterials = construction?.FluxMaterials?.Any(m => m != null) == true;
+                if (!hasMaterials)
+                    continue;
+
                 sb.AppendLine("<br/>");
                 sb.AppendLine("<table>");
                 sb.AppendLine("<thead>");
 
-                var title = HtmlEncode(string.IsNullOrWhiteSpace(construction.Name) ? "Unnamed Construction" : construction.Name);
+                var titleName = string.IsNullOrWhiteSpace(construction.Name) ? "Unnamed Construction" : construction.Name;
+                var titleId = string.IsNullOrWhiteSpace(construction.Id) ? "No ID" : construction.Id;
+                var title = HtmlEncode($"{titleId} - {titleName}");
                 sb.AppendLine($"<tr><th colspan=\"4\">{title}</th></tr>");
-                sb.AppendLine("<tr><th>Material Description</th><th>Thickness (m)</th><th>Thermal Conductivity (W/mK)</th><th>Thermal Resistance (m²K/W)</th></tr>");
+                sb.AppendLine("<tr><th>Layer Description</th><th>Thickness (m)</th><th>Thermal Conductivity (W/mK)</th><th>Thermal Resistance (m²K/W)</th></tr>");
                 sb.AppendLine("</thead>");
                 sb.AppendLine("<tbody>");
 
                 const double outsideFilmR = 0.044;
                 const double insideFilmR = 0.12;
                 double totalResistance = outsideFilmR + insideFilmR;
+
+                var outsideText = HtmlEncode($"{outsideFilmR:0.###}");
+                var insideText = HtmlEncode($"{insideFilmR:0.###}");
+                sb.AppendLine($"<tr><td>Outside air film</td><td>-</td><td>-</td><td>{outsideText}</td></tr>");
 
                 if (construction.FluxMaterials != null && construction.FluxMaterials.Count > 0)
                 {
@@ -305,9 +315,6 @@ namespace FacadeFluxCore
                     sb.AppendLine("<tr><td colspan=\"4\">No materials</td></tr>");
                 }
 
-                var outsideText = HtmlEncode($"{outsideFilmR:0.###}");
-                var insideText = HtmlEncode($"{insideFilmR:0.###}");
-                sb.AppendLine($"<tr><td>Outside air film</td><td>-</td><td>-</td><td>{outsideText}</td></tr>");
                 sb.AppendLine($"<tr><td>Inside air film</td><td>-</td><td>-</td><td>{insideText}</td></tr>");
 
                 var rSumText = totalResistance > 0 ? HtmlEncode($"{totalResistance:0.###}") : "N/A";

@@ -152,18 +152,24 @@ namespace FacadeFlux
             string htmlContent;
             string titleSuffix;
             string reportTitle;
+            string statusText;
+            string standardsNote;
 
             if (result is EttvModelResult ettv)
             {
                 htmlContent = ettv.BuildSummaryTableHtml();
                 titleSuffix = "ETTV Report";
                 reportTitle = "Envelope Thermal Transfer Value (ETTV) Report";
+                statusText = BuildStatusLine("ETTV", ettv.OverallAverageEttv, ettv.AverageHeatGain, 40d);
+                standardsNote = "BCA Standard ETTV (≤ 40 W/m²) is mandatory baseline requirements.";
             }
             else if (result is RetvModelResult retv)
             {
                 htmlContent = retv.BuildSummaryTableHtml();
                 titleSuffix = "RETV Report";
                 reportTitle = "Residential Envelope Thermal Transfer Value (RETV) Report";
+                statusText = BuildStatusLine("RETV", retv.OverallAverageRetv, retv.AverageRetv, 20d);
+                standardsNote = "BCA Standard RETV (≤ 20 W/m²) are mandatory baseline requirements.";
             }
             else
             {
@@ -181,6 +187,10 @@ namespace FacadeFlux
             var version = "1.0";
             var author = "Irfan Irwanuddin";
             var dateText = DateTime.Now.ToString("dd MMM yyyy");
+            var statusBlock = string.IsNullOrWhiteSpace(statusText)
+                ? string.Empty
+                : $"<p><strong>{WebUtility.HtmlEncode(statusText)}</strong></p>";
+            var standardsNoteText = string.IsNullOrWhiteSpace(standardsNote) ? string.Empty : WebUtility.HtmlEncode(standardsNote);
 
             var headerBlock = $@"<h1>{WebUtility.HtmlEncode(reportTitle)}</h1>
 <p>Produced with FacadeFlux Software<br/>
@@ -188,12 +198,14 @@ Version: {WebUtility.HtmlEncode(version)}<br/>
 Author: {WebUtility.HtmlEncode(author)}<br/>
 Project Name: {encodedProjectName}<br/>
 Date: {WebUtility.HtmlEncode(dateText)}</p>
+{statusBlock}
+<p>{standardsNoteText}</p>
 <hr/>";
 
             const string footerBlock = @"<hr/>
 <p>
-All calculations in this report are based on the BCA ETTV standard.<br/>
-For more information on the BCA ETTV guidelines, visit: <a href=""https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements"">https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements</a><br/>
+All calculations in this report are based on the BCA Code On Envelope Thermal Performance For Buildings document.<br/>
+For more information on the guidelines, visit: <a href=""https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements"">https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements</a><br/>
 Validation test case report can be found here: [Insert URL]
 </p>";
 
@@ -216,6 +228,20 @@ Validation test case report can be found here: [Insert URL]
 {footerBlock}
 </body>
 </html>";
+        }
+
+        private static string BuildStatusLine(string label, double primaryValue, double fallbackValue, double limit)
+        {
+            double value = primaryValue > 0d && !double.IsNaN(primaryValue) && !double.IsInfinity(primaryValue)
+                ? primaryValue
+                : fallbackValue;
+
+            if (double.IsNaN(value) || double.IsInfinity(value) || value <= 0d)
+                return string.Empty;
+
+            var comparison = value <= limit ? "Pass" : "Fail";
+            var comparator = value <= limit ? "≤" : ">";
+            return $"Status: {comparison} ({label} {value:0.###} {comparator} {limit:0.###} W/m²)";
         }
 
         public override GH_Exposure Exposure => GH_Exposure.primary;

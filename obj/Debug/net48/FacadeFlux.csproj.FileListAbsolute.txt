@@ -20,3 +20,4 @@
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net48/FacadeFlux.csproj.Up2Date
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net48/FacadeFlux.gha
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net48/FacadeFlux.pdb
+/Users/irfan/Documents/Learn/GitHub/FacadeFlux/bin/Debug/net48/Icons/FacadeFluxInfo.png

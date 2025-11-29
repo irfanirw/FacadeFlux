@@ -50,6 +50,11 @@
     <EmbeddedResource Include="Icons/FluxModelSurfaceHeatGain.png" />
     <EmbeddedResource Include="Icons/DisplayFluxConstructionName.png" />
     <EmbeddedResource Include="Icons/DisplayFluxConstructionType.png" />
+    <EmbeddedResource Include="Icons/FluxOpenReport.png" />
+    <EmbeddedResource Include="Icons/FacadeFluxInfo.png">
+      <LogicalName>FacadeFlux.Icons.FacadeFluxInfo.png</LogicalName>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
  
   </ItemGroup>
 

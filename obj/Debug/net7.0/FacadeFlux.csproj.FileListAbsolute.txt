@@ -19,3 +19,4 @@
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net7.0/FacadeFlux.pdb
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net7.0/FacadeFlux.genruntimeconfig.cache
 /Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/Debug/net7.0/ref/FacadeFlux.gha
+/Users/irfan/Documents/Learn/GitHub/FacadeFlux/bin/Debug/net7.0/Icons/FacadeFluxInfo.png
