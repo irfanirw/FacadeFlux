@@ -13,6 +13,7 @@ namespace FacadeFlux
         {
             { "Asphalt, roofing", 1.226 },
             { "Bitumen", 1.298 },
+            { "Air gap", 0.625 },
             { "Brick (dry, covered by plaster/tiles)", 0.807 },
             { "Brick (common brickwall directly exposed)", 1.154 },
             { "Concrete", 1.442 },

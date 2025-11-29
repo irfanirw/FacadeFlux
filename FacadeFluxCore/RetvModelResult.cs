@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -271,7 +272,8 @@ namespace FacadeFluxCore
                 sb.AppendLine("<table>");
                 sb.AppendLine("<thead>");
 
-                var titleName = string.IsNullOrWhiteSpace(construction.Name) ? "Unnamed Construction" : construction.Name;
+                var constructionName = string.IsNullOrWhiteSpace(construction.Name) ? "Unnamed Construction" : construction.Name;
+                var titleName = ToTitleCase(constructionName);
                 var titleId = string.IsNullOrWhiteSpace(construction.Id) ? "No ID" : construction.Id;
                 var title = HtmlEncode($"{titleId} - {titleName}");
                 sb.AppendLine($"<tr><th colspan=\"4\">{title}</th></tr>");
@@ -373,6 +375,15 @@ namespace FacadeFluxCore
             }
 
             return double.NaN;
+        }
+
+        private static string ToTitleCase(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var culture = CultureInfo.InvariantCulture;
+            return culture.TextInfo.ToTitleCase(value.ToLower(culture));
         }
 
         private static string HtmlEncode(string value) => System.Net.WebUtility.HtmlEncode(value ?? string.Empty);
