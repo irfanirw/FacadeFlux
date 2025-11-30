@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
+using Rhino.Display;
 using Rhino.Geometry;
 using FacadeFluxCore;
 
@@ -9,58 +12,107 @@ namespace FacadeFlux
 {
     public class DisplaySurfaceUvalueComponent : GH_Component
     {
+        private readonly List<(Mesh mesh, Color color)> _previewMeshes = new();
+
         public DisplaySurfaceUvalueComponent()
-            : base("Display Surface U-value", "DSU",
-                   "Extract surface meshes and construction U-values from an FluxModel",
-                   "FacadeFlux", "3 :: Post-processing")
+            : base("Display FluxConstruction U-Value", "DUV",
+                   "Displays FluxSurface geometry colored by FluxConstruction.Uvalue.",
+                   "FacadeFlux", "4 :: Utilities")
         {
         }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("FluxModel", "M", "FluxModel to inspect", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddMeshParameter("Surfaces", "S", "FluxSurface geometries", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Uvalues", "U", "Surface construction U-values (W/m²K)", GH_ParamAccess.list);
+            pManager.AddMeshParameter("Meshes", "Mesh", "Preview meshes with vertex colors", GH_ParamAccess.list);
+            pManager.AddColourParameter("Colors", "C", "Colors mapped to U-values in legend order", GH_ParamAccess.list);
+            pManager.AddTextParameter("Uvalue", "U", "U-values in the same order as Colors", GH_ParamAccess.list);
+            pManager.AddTextParameter("LegendTitle", "T", "Legend title matching the Colors/Legend outputs", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            object rawInput = null;
-            if (!DA.GetData(0, ref rawInput) || rawInput is null)
+            _previewMeshes.Clear();
+
+            if (!TryCollectSurfaces(DA, out var surfaces))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No FluxModel supplied.");
+                DA.SetDataList(0, null);
+                DA.SetDataList(1, null);
+                DA.SetDataList(2, new[] { "No FluxModel data provided." });
+                DA.SetData(3, "Flux Construction U-Values");
                 return;
             }
 
-            var model = UnwrapModel(rawInput);
-            if (model is null)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid FluxModel.");
-                return;
-            }
+            var meshesOut = new List<Mesh>();
+            var colorsOut = new List<Color>();
+            var legendLines = new List<string>();
 
-            var meshes = new List<Mesh>();
-            var uvalues = new List<double>();
+            var labels = surfaces
+                .Select(s => FormatUvalue(s?.Construction?.Uvalue))
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
 
-            var surfaces = model.Surfaces ?? new List<FluxSurface>();
+            var colorByLabel = new Dictionary<string, Color>(StringComparer.Ordinal);
+            for (int i = 0; i < labels.Count; i++)
+                colorByLabel[labels[i]] = PastelColor(i);
+
             foreach (var surface in surfaces)
             {
-                if (surface == null || surface.Geometry == null)
+                if (surface == null)
                     continue;
 
-                meshes.Add(surface.Geometry);
-                uvalues.Add(surface.Construction?.Uvalue ?? 0d);
+                var mesh = DuplicateMesh(surface);
+                if (mesh == null)
+                    continue;
+
+                var label = FormatUvalue(surface.Construction?.Uvalue);
+                var color = colorByLabel[label];
+
+                ApplyColor(mesh, color);
+
+                meshesOut.Add(mesh);
+                _previewMeshes.Add((mesh, color));
             }
 
-            if (meshes.Count == 0)
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Model contains no valid FluxSurface geometry.");
+            if (meshesOut.Count == 0)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No valid geometry could be drawn from the provided surfaces.");
+                DA.SetDataList(0, null);
+                DA.SetDataList(1, null);
+                DA.SetDataList(2, new[] { "No valid geometry generated." });
+                DA.SetData(3, "Flux Construction U-Values");
+                return;
+            }
 
-            DA.SetDataList(0, meshes);
-            DA.SetDataList(1, uvalues);
+            foreach (var label in labels)
+            {
+                legendLines.Add(label);
+                colorsOut.Add(colorByLabel[label]);
+            }
+
+            DA.SetDataList(0, meshesOut);
+            DA.SetDataList(1, colorsOut);
+            DA.SetDataList(2, legendLines);
+            DA.SetData(3, "Flux Construction U-Values");
+        }
+
+        private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)
+        {
+            surfaces = new List<FluxSurface>();
+            object raw = null;
+            DA.GetData(0, ref raw);
+
+            var model = UnwrapModel(raw);
+            if (model?.Surfaces == null)
+                return false;
+
+            surfaces = model.Surfaces.Where(s => s != null && s.Geometry != null).ToList();
+            return surfaces.Count > 0;
         }
 
         private static FluxModel UnwrapModel(object value)
@@ -79,6 +131,152 @@ namespace FacadeFlux
             }
 
             return null;
+        }
+
+        private static string FormatUvalue(double? value)
+        {
+            if (!value.HasValue || double.IsNaN(value.Value))
+                return "Unspecified";
+
+            return value.Value.ToString("0.###");
+        }
+
+        private static Mesh DuplicateMesh(FluxSurface surface)
+        {
+            switch (surface?.Geometry as object)
+            {
+                case Mesh mesh when mesh.IsValid:
+                    return mesh.DuplicateMesh();
+                case Brep brep:
+                    var meshes = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
+                    return CombineMeshes(meshes);
+                case Surface surf:
+                    var brepSurf = surf.ToBrep();
+                    var surfMeshes = Mesh.CreateFromBrep(brepSurf, MeshingParameters.FastRenderMesh);
+                    return CombineMeshes(surfMeshes);
+                default:
+                    return null;
+            }
+        }
+
+        private static Mesh CombineMeshes(IEnumerable<Mesh> meshes)
+        {
+            if (meshes == null)
+                return null;
+
+            var combined = new Mesh();
+            foreach (var mesh in meshes)
+            {
+                if (mesh == null || !mesh.IsValid)
+                    continue;
+
+                combined.Append(mesh);
+            }
+
+            if (combined.Faces.Count == 0)
+                return null;
+
+            combined.Normals.ComputeNormals();
+            combined.Compact();
+            return combined;
+        }
+
+        private static void ApplyColor(Mesh mesh, Color color)
+        {
+            if (mesh.VertexColors == null || mesh.VertexColors.Count == 0)
+            {
+                mesh.VertexColors.CreateMonotoneMesh(color);
+                return;
+            }
+
+            for (int i = 0; i < mesh.VertexColors.Count; i++)
+                mesh.VertexColors[i] = color;
+        }
+
+        private static Color PastelColor(int index)
+        {
+            Color[] palette = new[]
+            {
+                Color.FromArgb(186, 225, 255),
+                Color.FromArgb(255, 223, 186),
+                Color.FromArgb(214, 193, 255),
+                Color.FromArgb(186, 255, 201),
+                Color.FromArgb(255, 204, 229),
+                Color.FromArgb(255, 239, 213)
+            };
+
+            if (index < palette.Length)
+                return palette[index];
+
+            double hue = (index * 137) % 360;
+            return FromHsl(hue, 0.35, 0.85);
+        }
+
+        private static Color FromHsl(double hueDegrees, double saturation, double lightness)
+        {
+            double h = hueDegrees / 360.0;
+            double r = lightness;
+            double g = lightness;
+            double b = lightness;
+
+            if (saturation > 0)
+            {
+                double q = lightness < 0.5
+                    ? lightness * (1 + saturation)
+                    : lightness + saturation - lightness * saturation;
+                double p = 2 * lightness - q;
+                r = HueToRgb(p, q, h + 1.0 / 3.0);
+                g = HueToRgb(p, q, h);
+                b = HueToRgb(p, q, h - 1.0 / 3.0);
+            }
+
+            return Color.FromArgb(
+                255,
+                (int)Math.Round(r * 255),
+                (int)Math.Round(g * 255),
+                (int)Math.Round(b * 255));
+        }
+
+        private static double HueToRgb(double p, double q, double t)
+        {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1.0 / 6.0) return p + (q - p) * 6 * t;
+            if (t < 1.0 / 2.0) return q;
+            if (t < 2.0 / 3.0) return p + (q - p) * (2.0 / 3.0 - t) * 6;
+            return p;
+        }
+
+        public override void DrawViewportMeshes(IGH_PreviewArgs args)
+        {
+            foreach (var (mesh, color) in _previewMeshes)
+            {
+                if (mesh == null) continue;
+                args.Display.DrawMeshShaded(mesh, new DisplayMaterial(color));
+            }
+        }
+
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            foreach (var (mesh, color) in _previewMeshes)
+            {
+                if (mesh == null) continue;
+                args.Display.DrawMeshWires(mesh, color);
+            }
+        }
+
+        public override BoundingBox ClippingBox
+        {
+            get
+            {
+                var bbox = BoundingBox.Empty;
+                foreach (var (mesh, _) in _previewMeshes)
+                {
+                    if (mesh == null) continue;
+                    bbox.Union(mesh.GetBoundingBox(true));
+                }
+                return bbox;
+            }
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;

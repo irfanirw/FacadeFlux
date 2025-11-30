@@ -29,6 +29,7 @@ namespace FacadeFlux
         {
             pManager.AddTextParameter("HtmlPath", "P", "Path to generated HTML file", GH_ParamAccess.item);
             pManager.AddTextParameter("HtmlDocument", "H", "Full HTML document content", GH_ParamAccess.item);
+            pManager.AddTextParameter("FileDirectory", "D", "Folder containing the generated HTML file", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -47,6 +48,7 @@ namespace FacadeFlux
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No ETTV/RETV result provided.");
                 DA.SetData(0, null);
                 DA.SetData(1, null);
+                DA.SetData(2, null);
                 return;
             }
 
@@ -55,6 +57,7 @@ namespace FacadeFlux
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Enable RunExport to write the HTML file.");
                 DA.SetData(0, null);
                 DA.SetData(1, null);
+                DA.SetData(2, null);
                 return;
             }
 
@@ -64,13 +67,16 @@ namespace FacadeFlux
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Failed to build HTML document for the provided result.");
                 DA.SetData(0, null);
                 DA.SetData(1, null);
+                DA.SetData(2, null);
                 return;
             }
 
             var path = WriteHtmlDocument(result, document, customFileName);
+            var directory = string.IsNullOrWhiteSpace(path) ? null : Path.GetDirectoryName(path);
 
             DA.SetData(0, path);
             DA.SetData(1, document);
+            DA.SetData(2, directory);
         }
 
         private static object UnwrapResult(object value)

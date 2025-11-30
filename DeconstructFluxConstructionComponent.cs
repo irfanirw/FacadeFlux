@@ -23,10 +23,14 @@ namespace FacadeFlux
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddTextParameter("Summary", "S", "Readable construction details", GH_ParamAccess.item);      // index 0
-            pManager.AddNumberParameter("Uvalue", "U", "U-value (W/m²K)", GH_ParamAccess.item);                    // index 1
-            pManager.AddNumberParameter("ScTotal", "SC", "Solar control total (ScTotal)", GH_ParamAccess.item);    // index 2
-            pManager.AddGenericParameter("Materials", "M", "List of FluxMaterial", GH_ParamAccess.list);           // index 3
+            pManager.AddTextParameter("Summary", "S", "Readable construction details", GH_ParamAccess.item);           // index 0
+            pManager.AddNumberParameter("Uvalue", "U", "U-value (W/m²K)", GH_ParamAccess.item);                         // index 1
+            pManager.AddNumberParameter("ScTotal", "SC", "Solar control total (ScTotal)", GH_ParamAccess.item);         // index 2
+            pManager.AddNumberParameter("Sc1", "SC1", "Solar control factor 1", GH_ParamAccess.item);                   // index 3
+            pManager.AddNumberParameter("Sc2", "SC2", "Solar control factor 2", GH_ParamAccess.item);                   // index 4
+            pManager.AddGenericParameter("Materials", "M", "List of FluxMaterial", GH_ParamAccess.list);                // index 5
+            pManager.AddTextParameter("ConstructionName", "CN", "FluxConstruction.Name", GH_ParamAccess.item);          // index 6
+            pManager.AddTextParameter("ConstructionId", "CID", "FluxConstruction.Id", GH_ParamAccess.item);             // index 7
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -42,9 +46,15 @@ namespace FacadeFlux
             double uValue = 0.0;
             double scTotal = 0.0;
             bool scIsEmpty = false;
+            FluxConstruction construction = null;
+            double sc1Value = 0.0;
+            double sc2Value = 0.0;
+            bool sc1IsEmpty = true;
+            bool sc2IsEmpty = true;
 
             if (raw is FluxConstruction cons && raw.GetType().Assembly == typeof(FluxConstruction).Assembly)
             {
+                construction = cons;
                 result = FluxConstructionDeconstructor.ToText(cons);
                 uValue = cons.Uvalue;
                 if (cons.FluxMaterials != null)
@@ -54,6 +64,10 @@ namespace FacadeFlux
                 {
                     fen.CalculateScTotal(fen.Sc1, fen.Sc2);
                     scTotal = fen.Sc1 * (fen.Sc2 == 0 ? 1.0 : fen.Sc2);
+                    sc1Value = fen.Sc1;
+                    sc2Value = fen.Sc2;
+                    sc1IsEmpty = false;
+                    sc2IsEmpty = false;
                 }
                 else if (cons is FluxOpaqueConstruction)
                 {
@@ -67,6 +81,28 @@ namespace FacadeFlux
                         var v = pi.GetValue(cons);
                         if (v != null)
                             scTotal = Convert.ToDouble(v);
+                    }
+
+                    var sc1Prop = cons.GetType().GetProperty("Sc1", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                    if (sc1Prop != null)
+                    {
+                        var v = sc1Prop.GetValue(cons);
+                        if (v != null)
+                        {
+                            sc1Value = Convert.ToDouble(v);
+                            sc1IsEmpty = false;
+                        }
+                    }
+
+                    var sc2Prop = cons.GetType().GetProperty("Sc2", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                    if (sc2Prop != null)
+                    {
+                        var v = sc2Prop.GetValue(cons);
+                        if (v != null)
+                        {
+                            sc2Value = Convert.ToDouble(v);
+                            sc2IsEmpty = false;
+                        }
                     }
                 }
 
@@ -87,7 +123,13 @@ namespace FacadeFlux
             DA.SetData(1, uValue);
             if (scIsEmpty) DA.SetData(2, null);
             else DA.SetData(2, scTotal);
-            DA.SetDataList(3, mats);
+            if (sc1IsEmpty) DA.SetData(3, null);
+            else DA.SetData(3, sc1Value);
+            if (sc2IsEmpty) DA.SetData(4, null);
+            else DA.SetData(4, sc2Value);
+            DA.SetDataList(5, mats);
+            DA.SetData(6, construction?.Name);
+            DA.SetData(7, construction?.Id);
         }
 
         private static string BuildUValueFormula(IReadOnlyList<FluxMaterial> materials, double reportedU)

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using Rhino.DocObjects;
 
 namespace FacadeFlux
 {
@@ -104,8 +105,8 @@ namespace FacadeFlux
 
             if (titleHeight > 0)
             {
-                var titlePoint = new Point2d(originX + padding, currentY + fontHeight);
-                args.Display.Draw2dText(_title, Color.Black, titlePoint, false, fontHeight, "Arial");
+                var titlePoint = new Point2d(originX + padding, currentY);
+                args.Display.Draw2dText(_title, Color.Black, titlePoint, false, fontHeight);
                 currentY += titleHeight;
             }
 
@@ -116,9 +117,10 @@ namespace FacadeFlux
                 args.Display.Draw2dRectangle(swatchRect, Color.FromArgb(200, 30, 30, 30), 1, _colors[i]);
 
                 // Align text vertically with the swatch using its top-left corner as the anchor for Draw2dText.
+                // Align text vertically with the swatch using its top-left corner as the anchor for Draw2dText.
                 double textY = swatchRect.Y + (swatchSize - fontHeight) * 0.5;
                 var textPoint = new Point2d(swatchRect.Right + padding, textY);
-                args.Display.Draw2dText(_legend[i], Color.Black, textPoint, false, fontHeight, "Arial");
+                args.Display.Draw2dText(_legend[i], Color.Black, textPoint, false, fontHeight);
             }
         }
 

@@ -17,7 +17,7 @@ namespace FacadeFlux
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("FluxSurface", "S", "FluxSurface with FluxFenestrationConstruction", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Sc2", "Sc2", "External shading coefficient (0.0 - 1.0)", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("R1", "R1", "Shading projection ratio (projection/height) used to look up Sc2", GH_ParamAccess.item, 1.0);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -28,7 +28,7 @@ namespace FacadeFlux
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             object rawSurface = null;
-            double sc2 = 1.0;
+            double r1Ratio = 1.0;
 
             if (!DA.GetData(0, ref rawSurface))
             {
@@ -36,9 +36,9 @@ namespace FacadeFlux
                 return;
             }
 
-            if (!DA.GetData(1, ref sc2))
+            if (!DA.GetData(1, ref r1Ratio))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No Sc2 value provided.");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No R1 (projection/height) value provided.");
                 return;
             }
 
@@ -62,12 +62,8 @@ namespace FacadeFlux
                 return;
             }
 
-            // Validate Sc2 range
-            if (sc2 < 0.0 || sc2 > 1.0)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning,
-                    $"Sc2 value {sc2:F3} is outside typical range [0.0, 1.0]. Proceeding anyway.");
-            }
+            var orientation = surface.Orientation ?? new FluxOrientation { Name = "North" };
+            double computedSc2 = HorizontalSc2Calculator.Calculate(r1Ratio, 1.0, orientation);
 
             // Create a modified copy to avoid mutating the original
             var modifiedSurface = new FluxSurface
@@ -82,8 +78,8 @@ namespace FacadeFlux
                     Name = fenConstruction.Name,
                     Uvalue = fenConstruction.Uvalue,
                     Sc1 = fenConstruction.Sc1,
-                    Sc2 = sc2, // Apply new Sc2
-                    ScTotal = fenConstruction.Sc1 * sc2, // Recompute ScTotal
+                    Sc2 = computedSc2, // Apply Sc2 from lookup
+                    ScTotal = fenConstruction.Sc1 * computedSc2, // Recompute ScTotal
                     FluxMaterials = fenConstruction.FluxMaterials
                 }
             };

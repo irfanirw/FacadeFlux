@@ -5,11 +5,11 @@ using FacadeFluxCore;
 
 namespace FacadeFlux
 {
-    public class FluxSc2GeneratorComponent : GH_Component
+    public class FluxApplySc2ToWindowComponent : GH_Component
     {
-        public FluxSc2GeneratorComponent()
-          : base("FluxSc2Generator", "SC2",
-                 "Generate SC2 value for ETTV calculation",
+        public FluxApplySc2ToWindowComponent()
+          : base("FluxApplySc2ToWindow", "SC2",
+                 "Apply SC2 value to a fenestration FluxSurface for ETTV calculation",
                  "FacadeFlux", "1 :: Input & Geometry")
         { }
 

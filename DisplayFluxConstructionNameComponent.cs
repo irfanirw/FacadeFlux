@@ -33,7 +33,7 @@ namespace FacadeFlux
         {
             pManager.AddMeshParameter("Meshes", "Mesh", "Preview meshes with vertex colors", GH_ParamAccess.list);
             pManager.AddColourParameter("Colors", "C", "Colors mapped to FluxConstruction.Name in legend order", GH_ParamAccess.list);
-            pManager.AddTextParameter("Legend", "L", "Legend showing FluxConstruction.Name entries in the same order as Colors", GH_ParamAccess.list);
+            pManager.AddTextParameter("ConstructionName", "CN", "FluxConstruction.Name entries in the same order as Colors", GH_ParamAccess.list);
             pManager.AddTextParameter("LegendTitle", "T", "Legend title matching the Colors/Legend outputs", GH_ParamAccess.item);
         }
 
