@@ -32,7 +32,9 @@ namespace FacadeFlux
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
             pManager.AddMeshParameter("Meshes", "Mesh", "Preview meshes with vertex colors", GH_ParamAccess.list);
-            pManager.AddTextParameter("Legend", "L", "Legend showing FluxConstruction.Name to color mapping", GH_ParamAccess.item);
+            pManager.AddColourParameter("Colors", "C", "Colors mapped to FluxConstruction.Name in legend order", GH_ParamAccess.list);
+            pManager.AddTextParameter("Legend", "L", "Legend showing FluxConstruction.Name entries in the same order as Colors", GH_ParamAccess.list);
+            pManager.AddTextParameter("LegendTitle", "T", "Legend title matching the Colors/Legend outputs", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -42,11 +44,14 @@ namespace FacadeFlux
             if (!TryCollectSurfaces(DA, out var surfaces))
             {
                 DA.SetDataList(0, null);
-                DA.SetData(1, "No FluxModel data provided.");
+                DA.SetDataList(1, null);
+                DA.SetDataList(2, new[] { "No FluxModel data provided." });
+                DA.SetData(3, "Flux Construction Names");
                 return;
             }
 
             var meshesOut = new List<Mesh>();
+            var colorsOut = new List<Color>();
             var legendLines = new List<string>();
 
             var names = surfaces
@@ -83,20 +88,23 @@ namespace FacadeFlux
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No valid geometry could be drawn from the provided surfaces.");
                 DA.SetDataList(0, null);
-                DA.SetData(1, "No valid geometry generated.");
+                DA.SetDataList(1, null);
+                DA.SetDataList(2, new[] { "No valid geometry generated." });
+                DA.SetData(3, "Flux Construction Names");
                 return;
             }
 
-            foreach (var kvp in colorByName)
+            foreach (var name in names)
             {
-                var color = kvp.Value;
-                var hex = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-                legendLines.Add($"{kvp.Key}: {hex}");
+                var color = colorByName[name];
+                legendLines.Add(name);
+                colorsOut.Add(color);
             }
 
-            var legend = string.Join(Environment.NewLine, legendLines);
             DA.SetDataList(0, meshesOut);
-            DA.SetData(1, legend);
+            DA.SetDataList(1, colorsOut);
+            DA.SetDataList(2, legendLines);
+            DA.SetData(3, "Flux Construction Names");
         }
 
         private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)

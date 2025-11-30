@@ -55,6 +55,7 @@
       <LogicalName>FacadeFlux.Icons.FacadeFluxInfo.png</LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Icons/FluxLegend.png" />
  
   </ItemGroup>
 
