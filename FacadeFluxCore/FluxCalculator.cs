@@ -9,19 +9,9 @@ namespace FacadeFluxCore
         public FluxModel Model { get; set; }
         public double EttvLimit { get; set; } = 50.0; // Default ETTV limit (W/m²)
         public string Climate { get; set; } = "Tropical"; // Default climate
-
-        private static readonly Dictionary<string, double> CoolingFactors = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { "North", 211.0 },
-            { "NorthEast", 218.0 },
-            { "East", 224.0 },
-            { "SouthEast", 236.0 },
-            { "South", 240.0 },
-            { "SouthWest", 236.0 },
-            { "West", 224.0 },
-            { "NorthWest", 218.0 },
-            { "Roof", 150.0 }
-        };
+        private const double WallConductanceCoefficient = 12.0;
+        private const double FenestrationConductanceCoefficient = 3.4;
+        private const double SolarGainCoefficient = 211.0;
 
         public FluxCalculator() { }
 
@@ -71,16 +61,21 @@ namespace FacadeFluxCore
                     surfaces.Where(IsOpaque),
                     s => s.Construction?.Uvalue ?? 0.0);
 
+                double windowAreaWeightedU = AreaWeightedAverage(
+                    surfaces.Where(IsFenestration),
+                    s => s.Construction?.Uvalue ?? 0.0);
+
                 double windowAreaWeightedSc = AreaWeightedAverage(
                     surfaces.Where(IsFenestration),
                     s => GetScTotal(s.Construction as FluxFenestrationConstruction));
 
                 string orientationName = group.Key;
-                double cf = GetCoolingFactor(orientationName);
+                double cf = GetOrientationCf(surfaces);
 
-                double ettv = 15.0 * (1.0 - wwr)
-                              + (wwr * wallAreaWeightedU * cf)
-                              + (wwr * windowAreaWeightedSc * 0.45);
+                // ETTV = 12(1-WWR)Uw + 3.4(WWR)Uf + 211(WWR)SC*CF
+                double ettv = (WallConductanceCoefficient * (1.0 - wwr) * wallAreaWeightedU)
+                              + (FenestrationConductanceCoefficient * wwr * windowAreaWeightedU)
+                              + (SolarGainCoefficient * wwr * windowAreaWeightedSc * cf);
 
                 sumWeightedEttv += ettv * grossArea;
                 totalGrossArea += grossArea;
@@ -136,17 +131,6 @@ namespace FacadeFluxCore
             return denominator > double.Epsilon ? numerator / denominator : 0.0;
         }
 
-        private static string GetComponentKey(FluxSurface surface, string orientation)
-        {
-            if (IsRoof(orientation))
-                return "Roof";
-
-            return surface?.Type ?? "Unknown";
-        }
-
-        private static bool IsRoof(string orientation) =>
-            string.Equals(orientation, "Roof", StringComparison.OrdinalIgnoreCase);
-
         private static bool IsOpaque(FluxSurface surface) =>
             surface != null && !IsFenestration(surface);
 
@@ -177,15 +161,29 @@ namespace FacadeFluxCore
             return sc > 0.0 ? sc : 1.0;
         }
 
-        private static double GetCoolingFactor(string orientation)
+        private static double GetOrientationCf(List<FluxSurface> surfaces)
         {
-            if (string.IsNullOrEmpty(orientation))
-                return 211.0;
+            if (surfaces == null || surfaces.Count == 0)
+                return 1.0;
 
-            if (CoolingFactors.TryGetValue(orientation, out var value))
-                return value;
+            foreach (var s in surfaces)
+            {
+                var cf = s?.Orientation?.Cf ?? 0.0;
+                if (cf > 0.0)
+                    return cf;
+            }
 
-            return 211.0;
+            // Derive CF from the orientation name if Cf was not precomputed.
+            var firstName = surfaces[0]?.Orientation?.Name;
+            if (!string.IsNullOrWhiteSpace(firstName))
+            {
+                var orientation = new FluxOrientation { Name = firstName };
+                orientation.SetCf();
+                if (orientation.Cf > 0.0)
+                    return orientation.Cf;
+            }
+
+            return 1.0;
         }
 
         private static double GetSurfaceArea(FluxSurface surface)

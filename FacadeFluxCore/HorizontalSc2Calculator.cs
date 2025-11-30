@@ -42,20 +42,28 @@ namespace FacadeFluxCore
                 return 1.0;
 
             double r1 = projection / height;
-            var orientationKey = !string.IsNullOrWhiteSpace(orientation?.Name)
-                ? orientation.Name
-                : orientation?.Id;
-            var table = SelectTable(orientationKey);
+            var table = SelectTable(orientation);
 
             return SampleSc2(table, r1);
         }
 
-        private static double[] SelectTable(string orientationName)
+        private static double[] SelectTable(FluxOrientation orientation)
         {
-            if (string.IsNullOrWhiteSpace(orientationName))
-                return TableNorthSouth;
+            var tableFromName = TryGetTableForKey(NormalizeOrientationName(orientation?.Name));
+            if (tableFromName != null)
+                return tableFromName;
 
-            var key = NormalizeOrientationName(orientationName);
+            var tableFromId = TryGetTableForKey(NormalizeOrientationName(orientation?.Id));
+            if (tableFromId != null)
+                return tableFromId;
+
+            return TableNorthSouth;
+        }
+
+        private static double[] TryGetTableForKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
 
             switch (key)
             {
@@ -64,37 +72,67 @@ namespace FacadeFluxCore
                 case "n":
                 case "s":
                     return TableNorthSouth;
-
                 case "east":
                 case "west":
                 case "e":
                 case "w":
                     return TableEastWest;
-
                 case "northeast":
                 case "northwest":
                 case "ne":
                 case "nw":
                     return TableNorthEastWest;
-
                 case "southeast":
                 case "southwest":
                 case "se":
                 case "sw":
                     return TableSouthEastWest;
-
-                default:
-                    return TableNorthSouth;
             }
+
+            // Heuristic: if the normalized key contains direction words, infer a table.
+            bool hasNorth = key.Contains("north");
+            bool hasSouth = key.Contains("south");
+            bool hasEast = key.Contains("east");
+            bool hasWest = key.Contains("west");
+            bool hasNE = key.Contains("ne");
+            bool hasNW = key.Contains("nw");
+            bool hasSE = key.Contains("se");
+            bool hasSW = key.Contains("sw");
+
+            if ((hasNorth && hasEast) || hasNE)
+                return TableNorthEastWest;
+            if ((hasNorth && hasWest) || hasNW)
+                return TableNorthEastWest;
+            if ((hasSouth && hasEast) || hasSE)
+                return TableSouthEastWest;
+            if ((hasSouth && hasWest) || hasSW)
+                return TableSouthEastWest;
+            if (hasEast || hasWest)
+                return TableEastWest;
+            if (hasNorth || hasSouth)
+                return TableNorthSouth;
+
+            return null;
         }
 
         private static string NormalizeOrientationName(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
             var trimmed = name.Trim().ToLowerInvariant();
             // Remove separators like spaces or hyphens, e.g., "north east" => "northeast".
-            trimmed = trimmed.Replace(" ", string.Empty).Replace("-", string.Empty).Replace("_", string.Empty);
+            trimmed = trimmed
+                .Replace(" ", string.Empty)
+                .Replace("-", string.Empty)
+                .Replace("_", string.Empty)
+                .Replace("(", string.Empty)
+                .Replace(")", string.Empty)
+                .Replace("facing", string.Empty)
+                .Replace("direction", string.Empty);
             return trimmed;
         }
+
 
         private static double SampleSc2(double[] table, double ratio)
         {

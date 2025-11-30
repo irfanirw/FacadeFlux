@@ -16,75 +16,109 @@ namespace FacadeFlux
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("FluxSurface", "S", "FluxSurface with FluxFenestrationConstruction", GH_ParamAccess.item);
-            pManager.AddNumberParameter("R1", "R1", "Shading projection ratio (projection/height) used to look up Sc2", GH_ParamAccess.item, 1.0);
+            pManager.AddGenericParameter("FluxSurface", "S", "FluxSurface(s) with FluxFenestrationConstruction", GH_ParamAccess.list);
+            pManager.AddNumberParameter("R1", "R1", "Shading projection ratio (projection/height) used to look up Sc2", GH_ParamAccess.list);
+            pManager[1].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("FluxSurface", "S", "Modified FluxSurface with updated Sc2 and ScTotal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxSurface", "S", "Modified FluxSurface list with updated Sc2 and ScTotal", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            object rawSurface = null;
-            double r1Ratio = 1.0;
+            var rawSurfaces = new List<object>();
+            var r1Values = new List<double>();
+            DA.GetDataList(0, rawSurfaces);
+            DA.GetDataList(1, r1Values);
 
-            if (!DA.GetData(0, ref rawSurface))
+            if (rawSurfaces.Count == 0)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No FluxSurface provided.");
                 return;
             }
 
-            if (!DA.GetData(1, ref r1Ratio))
+            var outputs = new List<FluxSurface>();
+            bool anyNonFen = false;
+
+            for (int i = 0; i < rawSurfaces.Count; i++)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No R1 (projection/height) value provided.");
-                return;
-            }
-
-            // Unwrap GH_Goo
-            object v = rawSurface;
-            if (v is IGH_Goo goo)
-                v = (goo as GH_ObjectWrapper)?.Value ?? goo.ScriptVariable();
-
-            if (!(v is FluxSurface surface) || v.GetType().Assembly != typeof(FluxSurface).Assembly)
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid FluxSurface object.");
-                return;
-            }
-
-            // Check if construction is FluxFenestrationConstruction
-            if (!(surface.Construction is FluxFenestrationConstruction fenConstruction))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning,
-                    "FluxSurface does not contain FluxFenestrationConstruction. External shading (Sc2) is only applicable to fenestration.");
-                DA.SetData(0, surface);
-                return;
-            }
-
-            var orientation = surface.Orientation ?? new FluxOrientation { Name = "North" };
-            double computedSc2 = HorizontalSc2Calculator.Calculate(r1Ratio, 1.0, orientation);
-
-            // Create a modified copy to avoid mutating the original
-            var modifiedSurface = new FluxSurface
-            {
-                Id = surface.Id,
-                Name = surface.Name,
-                Geometry = surface.Geometry,
-                Orientation = surface.Orientation,
-                Construction = new FluxFenestrationConstruction
+                var surface = UnwrapSurface(rawSurfaces[i]);
+                if (surface == null)
                 {
-                    Id = fenConstruction.Id,
-                    Name = fenConstruction.Name,
-                    Uvalue = fenConstruction.Uvalue,
-                    Sc1 = fenConstruction.Sc1,
-                    Sc2 = computedSc2, // Apply Sc2 from lookup
-                    ScTotal = fenConstruction.Sc1 * computedSc2, // Recompute ScTotal
-                    FluxMaterials = fenConstruction.FluxMaterials
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Item {i + 1}: Input is not a valid FluxSurface object.");
+                    continue;
                 }
-            };
 
-            DA.SetData(0, modifiedSurface);
+                if (surface.Construction is not FluxFenestrationConstruction fenConstruction)
+                {
+                    anyNonFen = true;
+                    outputs.Add(surface);
+                    continue;
+                }
+
+                double r1 = GetR1ForIndex(r1Values, i);
+                var orientation = surface.Orientation ?? new FluxOrientation { Name = "North" };
+                double computedSc2 = HorizontalSc2Calculator.Calculate(r1, 1.0, orientation);
+
+                var modifiedSurface = new FluxSurface
+                {
+                    Id = surface.Id,
+                    Name = surface.Name,
+                    Geometry = surface.Geometry,
+                    Orientation = surface.Orientation,
+                    Construction = new FluxFenestrationConstruction
+                    {
+                        Id = fenConstruction.Id,
+                        Name = fenConstruction.Name,
+                        Uvalue = fenConstruction.Uvalue,
+                        Sc1 = fenConstruction.Sc1,
+                        Sc2 = computedSc2,
+                        ScTotal = fenConstruction.Sc1 * computedSc2,
+                        FluxMaterials = fenConstruction.FluxMaterials
+                    }
+                };
+
+                outputs.Add(modifiedSurface);
+            }
+
+            if (anyNonFen)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Some surfaces are not fenestration; their Sc2 was left unchanged.");
+            }
+
+            DA.SetDataList(0, outputs);
+        }
+
+        private static FluxSurface UnwrapSurface(object raw)
+        {
+            if (raw is FluxSurface surface && raw.GetType().Assembly == typeof(FluxSurface).Assembly)
+                return surface;
+
+            if (raw is IGH_Goo goo)
+            {
+                if (goo is GH_ObjectWrapper wrapper && wrapper.Value is FluxSurface wrapped && wrapper.Value.GetType().Assembly == typeof(FluxSurface).Assembly)
+                    return wrapped;
+
+                var scriptValue = goo.ScriptVariable();
+                if (scriptValue is FluxSurface scriptSurface && scriptSurface.GetType().Assembly == typeof(FluxSurface).Assembly)
+                    return scriptSurface;
+            }
+
+            return null;
+        }
+
+        private static double GetR1ForIndex(IReadOnlyList<double> r1Values, int index)
+        {
+            if (r1Values == null || r1Values.Count == 0)
+                return 1.0;
+
+            if (index < r1Values.Count)
+                return r1Values[index];
+
+            // For older frameworks without Index (^) support, use the last element explicitly.
+            return r1Values[r1Values.Count - 1];
         }
 
         public override GH_Exposure Exposure => GH_Exposure.secondary;
