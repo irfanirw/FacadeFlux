@@ -2,7 +2,6 @@
 
 A Grasshopper toolkit for BCA Singapore facade compliance workflows (ETTV and RETV).
 
-[![build]](#) [![license]](#) [![release]](#)
 
 ## Overview
 
