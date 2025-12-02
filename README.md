@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" alt="FacadeFlux Logo" width="128" height="128">
+</p>
+
 # FacadeFlux
 
 FacadeFlux is a Grasshopper toolkit for BCA Singapore facade compliance workflows (ETTV and RETV). It wraps the core calculation library and a set of components that build facade models, calculate values, visualize construction types, and export lightweight reports.
