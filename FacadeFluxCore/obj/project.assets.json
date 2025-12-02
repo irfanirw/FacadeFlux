@@ -1379,11 +1379,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+      "projectUniqueName": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
       "projectName": "FacadeFluxCore",
-      "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+      "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
       "packagesPath": "/Users/irfan/.nuget/packages/",
-      "outputPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/obj/",
+      "outputPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/obj/",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "configFilePaths": [
