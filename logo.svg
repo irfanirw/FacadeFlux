@@ -38,7 +38,12 @@
   
   <!-- Sun rays indicating thermal analysis -->
   <circle cx="108" cy="22" r="8" fill="#FFEB3B"/>
-  <line x1="108" y1="8" x2="108" y2="14" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
-  <line x1="120" y1="22" x2="114" y2="22" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
-  <line x1="116" y1="14" x2="112" y2="18" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="108" y1="6" x2="108" y2="12" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="122" y1="22" x2="116" y2="22" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="118" y1="12" x2="114" y2="16" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="118" y1="32" x2="114" y2="28" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="98" y1="12" x2="102" y2="16" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="94" y1="22" x2="100" y2="22" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="98" y1="32" x2="102" y2="28" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="108" y1="38" x2="108" y2="32" stroke="#FFEB3B" stroke-width="2" stroke-linecap="round"/>
 </svg>
