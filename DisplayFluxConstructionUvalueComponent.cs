@@ -10,11 +10,11 @@ using FacadeFluxCore;
 
 namespace FacadeFlux
 {
-    public class DisplaySurfaceUvalueComponent : GH_Component
+    public class DisplayFluxConstructionUvalueComponent : GH_Component
     {
         private readonly List<(Mesh mesh, Color color)> _previewMeshes = new();
 
-        public DisplaySurfaceUvalueComponent()
+        public DisplayFluxConstructionUvalueComponent()
             : base("Display FluxConstruction U-Value", "DUV",
                    "Displays FluxSurface geometry colored by FluxConstruction.Uvalue.",
                    "FacadeFlux", "4 :: Utilities")
@@ -44,7 +44,7 @@ namespace FacadeFlux
                 DA.SetDataList(0, null);
                 DA.SetDataList(1, null);
                 DA.SetDataList(2, new[] { "No FluxModel data provided." });
-                DA.SetData(3, "Flux Construction U-Values");
+                DA.SetData(3, "U-value (W/m²K)");
                 return;
             }
 
@@ -52,14 +52,14 @@ namespace FacadeFlux
             var colorsOut = new List<Color>();
             var legendLines = new List<string>();
 
-            var labels = surfaces
-                .Select(s => FormatUvalue(s?.Construction?.Uvalue))
-                .Distinct(StringComparer.Ordinal)
+            var uValues = surfaces
+                .Select(s => s?.Construction?.Uvalue)
+                .Where(v => v.HasValue && !double.IsNaN(v.Value))
+                .Select(v => v.Value)
                 .ToList();
 
-            var colorByLabel = new Dictionary<string, Color>(StringComparer.Ordinal);
-            for (int i = 0; i < labels.Count; i++)
-                colorByLabel[labels[i]] = PastelColor(i);
+            double minU = uValues.Count > 0 ? uValues.Min() : 0d;
+            double maxU = uValues.Count > 0 ? uValues.Max() : 1d;
 
             foreach (var surface in surfaces)
             {
@@ -70,8 +70,10 @@ namespace FacadeFlux
                 if (mesh == null)
                     continue;
 
-                var label = FormatUvalue(surface.Construction?.Uvalue);
-                var color = colorByLabel[label];
+                double? uVal = surface.Construction?.Uvalue;
+                var color = uVal.HasValue && !double.IsNaN(uVal.Value)
+                    ? JetColor(Normalize(uVal.Value, minU, maxU))
+                    : Color.LightGray;
 
                 ApplyColor(mesh, color);
 
@@ -85,20 +87,29 @@ namespace FacadeFlux
                 DA.SetDataList(0, null);
                 DA.SetDataList(1, null);
                 DA.SetDataList(2, new[] { "No valid geometry generated." });
-                DA.SetData(3, "Flux Construction U-Values");
+                DA.SetData(3, "U-value (W/m²K)");
                 return;
             }
 
-            foreach (var label in labels)
+            if (uValues.Count == 0)
             {
-                legendLines.Add(label);
-                colorsOut.Add(colorByLabel[label]);
+                legendLines.Add("Unspecified");
+                colorsOut.Add(Color.LightGray);
+            }
+            else
+            {
+                var legendValues = BuildLegendStops(minU, maxU);
+                foreach (var val in legendValues)
+                {
+                    colorsOut.Add(JetColor(Normalize(val, minU, maxU)));
+                    legendLines.Add(FormatUvalue(val));
+                }
             }
 
             DA.SetDataList(0, meshesOut);
             DA.SetDataList(1, colorsOut);
             DA.SetDataList(2, legendLines);
-            DA.SetData(3, "Flux Construction U-Values");
+            DA.SetData(3, "U-value (W/m²K)");
         }
 
         private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)
@@ -193,58 +204,50 @@ namespace FacadeFlux
                 mesh.VertexColors[i] = color;
         }
 
-        private static Color PastelColor(int index)
+        private static List<double> BuildLegendStops(double min, double max, int steps = 7)
         {
-            Color[] palette = new[]
+            if (Math.Abs(max - min) < 1e-9)
+                return new List<double> { min };
+
+            var values = new List<double>();
+            for (int i = 0; i < steps; i++)
             {
-                Color.FromArgb(186, 225, 255),
-                Color.FromArgb(255, 223, 186),
-                Color.FromArgb(214, 193, 255),
-                Color.FromArgb(186, 255, 201),
-                Color.FromArgb(255, 204, 229),
-                Color.FromArgb(255, 239, 213)
-            };
+                double t = i / (double)(steps - 1);
+                values.Add(min + (max - min) * t);
+            }
 
-            if (index < palette.Length)
-                return palette[index];
-
-            double hue = (index * 137) % 360;
-            return FromHsl(hue, 0.35, 0.85);
+            return values;
         }
 
-        private static Color FromHsl(double hueDegrees, double saturation, double lightness)
+        private static double Normalize(double value, double min, double max)
         {
-            double h = hueDegrees / 360.0;
-            double r = lightness;
-            double g = lightness;
-            double b = lightness;
+            if (Math.Abs(max - min) < 1e-9)
+                return 0.5;
 
-            if (saturation > 0)
-            {
-                double q = lightness < 0.5
-                    ? lightness * (1 + saturation)
-                    : lightness + saturation - lightness * saturation;
-                double p = 2 * lightness - q;
-                r = HueToRgb(p, q, h + 1.0 / 3.0);
-                g = HueToRgb(p, q, h);
-                b = HueToRgb(p, q, h - 1.0 / 3.0);
-            }
+            double t = (value - min) / (max - min);
+            return Clamp01(t);
+        }
+
+        private static double Clamp01(double value)
+        {
+            if (value < 0d) return 0d;
+            if (value > 1d) return 1d;
+            return value;
+        }
+
+        private static Color JetColor(double t)
+        {
+            t = Clamp01(t);
+
+            double r = Clamp01(1.5 - Math.Abs(4 * t - 3));
+            double g = Clamp01(1.5 - Math.Abs(4 * t - 2));
+            double b = Clamp01(1.5 - Math.Abs(4 * t - 1));
 
             return Color.FromArgb(
                 255,
                 (int)Math.Round(r * 255),
                 (int)Math.Round(g * 255),
                 (int)Math.Round(b * 255));
-        }
-
-        private static double HueToRgb(double p, double q, double t)
-        {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1.0 / 6.0) return p + (q - p) * 6 * t;
-            if (t < 1.0 / 2.0) return q;
-            if (t < 2.0 / 3.0) return p + (q - p) * (2.0 / 3.0 - t) * 6;
-            return p;
         }
 
         public override void DrawViewportMeshes(IGH_PreviewArgs args)
