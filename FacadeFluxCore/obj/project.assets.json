@@ -2,6 +2,28 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.8": {
+      "Grasshopper/8.0.23304.9001": {
+        "type": "package",
+        "dependencies": {
+          "RhinoCommon": "[8.0.23304.9001]"
+        },
+        "compile": {
+          "lib/net48/GH_IO.dll": {
+            "related": ".xml"
+          },
+          "lib/net48/Grasshopper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net48/_._": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/net48/Grasshopper.targets": {}
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/9.0.10": {
         "type": "package",
         "dependencies": {
@@ -243,6 +265,28 @@
       }
     },
     "net7.0": {
+      "Grasshopper/8.0.23304.9001": {
+        "type": "package",
+        "dependencies": {
+          "RhinoCommon": "[8.0.23304.9001]"
+        },
+        "compile": {
+          "lib/net48/GH_IO.dll": {
+            "related": ".xml"
+          },
+          "lib/net48/Grasshopper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net48/_._": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/net48/Grasshopper.targets": {}
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/9.0.10": {
         "type": "package",
         "compile": {
@@ -407,6 +451,28 @@
       }
     },
     "net9.0": {
+      "Grasshopper/8.0.23304.9001": {
+        "type": "package",
+        "dependencies": {
+          "RhinoCommon": "[8.0.23304.9001]"
+        },
+        "compile": {
+          "lib/net48/GH_IO.dll": {
+            "related": ".xml"
+          },
+          "lib/net48/Grasshopper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net48/_._": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/net48/Grasshopper.targets": {}
+        }
+      },
       "Newtonsoft.Json/13.0.4": {
         "type": "package",
         "compile": {
@@ -462,6 +528,23 @@
     }
   },
   "libraries": {
+    "Grasshopper/8.0.23304.9001": {
+      "sha512": "L1Cse6nAxryzcZ7jsu3WzBiG9BYtgYsaNbRV+p55N+THKTFGmXx1PdBbiWtuxK9kB4jyuLVpeV8XBiYlSGA1Vw==",
+      "type": "package",
+      "path": "grasshopper/8.0.23304.9001",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/net48/Grasshopper.targets",
+        "grasshopper.8.0.23304.9001.nupkg.sha512",
+        "grasshopper.nuspec",
+        "grasshopper.png",
+        "lib/net48/GH_IO.dll",
+        "lib/net48/GH_IO.xml",
+        "lib/net48/Grasshopper.dll",
+        "lib/net48/Grasshopper.xml"
+      ]
+    },
     "Microsoft.Bcl.AsyncInterfaces/9.0.10": {
       "sha512": "iUfw06CsVKAliec4ML6Q91ozbQ8SKbiraIiQegECAPeMY8cGGagIbyZ9+PBtTJ0hx1//qpRqdXDkt51SDQ6k+Q==",
       "type": "package",
@@ -1271,17 +1354,20 @@
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
+      "Grasshopper >= 8.0.23304.9001",
       "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3",
       "Newtonsoft.Json >= 13.0.4",
       "RhinoCommon >= 8.0.23304.9001",
       "System.Text.Json >= 9.0.10"
     ],
     "net7.0": [
+      "Grasshopper >= 8.0.23304.9001",
       "Newtonsoft.Json >= 13.0.4",
       "RhinoCommon >= 8.0.23304.9001",
       "System.Text.Json >= 9.0.10"
     ],
     "net9.0": [
+      "Grasshopper >= 8.0.23304.9001",
       "Newtonsoft.Json >= 13.0.4",
       "RhinoCommon >= 8.0.23304.9001",
       "System.Text.Json >= 9.0.10"
@@ -1341,6 +1427,11 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "Grasshopper": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[8.0.23304.9001, )"
+          },
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.4, )"
@@ -1386,6 +1477,11 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
+          "Grasshopper": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[8.0.23304.9001, )"
+          },
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.4, )"
@@ -1421,6 +1517,11 @@
       "net48": {
         "targetAlias": "net48",
         "dependencies": {
+          "Grasshopper": {
+            "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[8.0.23304.9001, )"
+          },
           "Microsoft.NETFramework.ReferenceAssemblies": {
             "suppressParent": "All",
             "target": "Package",
@@ -1446,6 +1547,16 @@
     }
   },
   "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Grasshopper 8.0.23304.9001' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Grasshopper",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
     {
       "code": "NU1701",
       "level": "Warning",

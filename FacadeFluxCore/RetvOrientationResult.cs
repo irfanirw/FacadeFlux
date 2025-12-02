@@ -44,7 +44,7 @@ namespace FacadeFluxCore
             sb.AppendLine($"Wall area: {WallArea:0.###} m²");
             sb.AppendLine($"Gross area: {GrossArea:0.###} m²");
             sb.AppendLine($"Total envelope gain: {TotalEnvelopeGain:0.###} W");
-            sb.AppendLine($"Correction factor (Cf): {(Orientation?.Cf ?? 0d):0.###}");
+            sb.AppendLine($"Correction Factor (CF): {(Orientation?.Cf ?? 0d):0.###}");
 
             AppendConstructionBreakdown(sb);
 

@@ -9,7 +9,7 @@ namespace FacadeFlux
         public FluxMaterialComponent()
           : base("FluxMaterial", "EM",
                  "Create an FluxMaterial (placeholder)",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

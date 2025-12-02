@@ -13,6 +13,7 @@ namespace FacadeFlux
         {
             { "Asphalt, roofing", 1.226 },
             { "Bitumen", 1.298 },
+            { "Air gap", 0.625 },
             { "Brick (dry, covered by plaster/tiles)", 0.807 },
             { "Brick (common brickwall directly exposed)", 1.154 },
             { "Concrete", 1.442 },
@@ -57,7 +58,7 @@ namespace FacadeFlux
         public FluxMaterialDatabaseComponent()
           : base("FluxMaterialDatabase", "EMD",
                  "Select building material and get its thermal conductivity (k-value)",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "FacadeFlux", "1 :: Input & Geometry")
         { }
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -121,7 +122,7 @@ namespace FacadeFlux
             return base.Read(reader);
         }
 
-        public override GH_Exposure Exposure => GH_Exposure.secondary;
+        public override GH_Exposure Exposure => GH_Exposure.primary;
 
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxMaterialDatabase.png");
 

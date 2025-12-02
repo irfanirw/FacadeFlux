@@ -95,6 +95,7 @@
       "System.Threading.Tasks.Extensions/4.5.4": {},
       "FacadeFluxCore/1.0.0": {
         "dependencies": {
+          "Grasshopper": "8.0.23304.9001",
           "Newtonsoft.Json": "13.0.4",
           "RhinoCommon": "8.0.23304.9001",
           "System.Text.Json": "9.0.10"

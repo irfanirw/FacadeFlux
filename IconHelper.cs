@@ -1,32 +1,51 @@
 using System;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 
 namespace FacadeFlux
 {
     internal static class IconHelper
     {
         /// <summary>
-        /// Loads an embedded PNG icon from the assembly. Returns null on non-Windows platforms
-        /// because System.Drawing.Common is only supported on Windows in .NET 7.
+        /// Loads an embedded PNG icon from the assembly. Returns null if it cannot be loaded.
         /// </summary>
         /// <param name="resourceName">Full resource path (e.g., "FacadeFlux.Icons.MyIcon.png").</param>
         /// <returns>Bitmap when available, otherwise null.</returns>
-        public static System.Drawing.Bitmap LoadIcon(string resourceName)
-        {
-            if (!IsWindows())
-                return null;
-
-            var assembly = typeof(IconHelper).Assembly;
-            using var stream = assembly.GetManifestResourceStream(resourceName);
-            return stream is null ? null : new System.Drawing.Bitmap(stream);
-        }
-
-        private static bool IsWindows()
+        public static Bitmap LoadIcon(string resourceName)
         {
 #if NET7_0_OR_GREATER
-            return OperatingSystem.IsWindows();
-#else
-            return Environment.OSVersion.Platform == PlatformID.Win32NT;
+            // Allow System.Drawing on non-Windows (requires libgdiplus on Unix).
+            AppContext.SetSwitch("System.Drawing.EnableUnixSupport", true);
 #endif
+
+            var assembly = typeof(IconHelper).Assembly;
+            Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+            if (stream == null)
+            {
+                // Fallback: try to find an alternative resource name ending with the same suffix.
+                var alt = assembly.GetManifestResourceNames()
+                    .FirstOrDefault(n => n.EndsWith(resourceName, StringComparison.OrdinalIgnoreCase)
+                                      || n.EndsWith(resourceName.Replace("FacadeFlux.", string.Empty), StringComparison.OrdinalIgnoreCase));
+                if (alt != null)
+                    stream = assembly.GetManifestResourceStream(alt);
+            }
+
+            if (stream == null)
+                return null;
+
+            try
+            {
+                using (stream)
+                {
+                    return new Bitmap(stream);
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "9RqBZxqB18M=",
+  "dgSpecHash": "BCtjzm7zGdU=",
   "success": true,
   "projectFilePath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
   "expectedPackageFiles": [
+    "/Users/irfan/.nuget/packages/grasshopper/8.0.23304.9001/grasshopper.8.0.23304.9001.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.bcl.asyncinterfaces/9.0.10/microsoft.bcl.asyncinterfaces.9.0.10.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.3/microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
     "/Users/irfan/.nuget/packages/microsoft.netframework.referenceassemblies.net48/1.0.3/microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg.sha512",
@@ -22,6 +23,18 @@
     "/Users/irfan/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.20/microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Package 'Grasshopper 8.0.23304.9001' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+      "libraryId": "Grasshopper",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
     {
       "code": "NU1701",
       "level": "Warning",

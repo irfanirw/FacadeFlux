@@ -11,8 +11,8 @@ namespace FacadeFlux
     {
         public FluxUValueComponent()
           : base("FluxUValueCalculator", "FU",
-                 "Calculate U-value from a list of Flux materials",
-                 "FacadeFlux", "Geometry & Inputs")
+                 "Calculate U-value from a list of FluxMaterials",
+                 "FacadeFlux", "2 :: Analysis")
         { }
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)

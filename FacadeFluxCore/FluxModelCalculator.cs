@@ -72,10 +72,11 @@ namespace FacadeFluxCore
 
                 double cf = orientation.Cf <= 0 ? 1.0 : orientation.Cf;
 
-                                double etTvValue = gross > 0
-                                        ? (wallConductanceCoefficient * (1.0 - wwr) * wallU)
-                                            + (fenestrationConductanceCoefficient * wwr * fenestrationU * sc)
-                                            + (solarGainCoefficient * wwr * cf)
+                // ETTV = 12(1-WWR)Uw + 3.4(WWR)Uf + 211(WWR)SC*CF
+                double etTvValue = gross > 0
+                    ? (wallConductanceCoefficient * (1.0 - wwr) * wallU)
+                      + (fenestrationConductanceCoefficient * wwr * fenestrationU)
+                      + (solarGainCoefficient * wwr * sc * cf)
                     : 0.0;
 
                 orientationResult.AverageHeatGain = etTvValue;
