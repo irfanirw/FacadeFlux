@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="" alt="FacadeFlux Logo" width="128" height="128">
-</p>
-
-
 # FacadeFlux
 
 A Grasshopper toolkit for BCA Singapore facade compliance workflows (ETTV and RETV).
