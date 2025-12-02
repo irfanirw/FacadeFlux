@@ -18,21 +18,21 @@ Version: 1.0<br/>
 Author: Irfan Irwanuddin<br/>
 Project Name: BCA_CaseStudy1<br/>
 Date: 02 Dec 2025</p>
-<p><strong>Status: Fail (ETTV 59.986 &gt; 40 W/m&#178;)</strong></p>
+<p><strong>Status: Fail (ETTV 61.039 &gt; 40 W/m&#178;)</strong></p>
 <p>BCA Standard ETTV (≤ 40 W/m&#178;) is mandatory baseline requirements.</p>
 <hr/>
 <table>
 <tr>
 <th style="text-align:left;">Average heat gain</th>
-<td>59.986 W/m&#178;</td>
+<td>61.039 W/m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">WWR</th>
-<td>42.38 %</td>
+<td>44.05 %</td>
 </tr>
 <tr>
 <th style="text-align:left;">Window area</th>
-<td>3412.14 m&#178;</td>
+<td>3653.34 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Wall area</th>
@@ -40,11 +40,11 @@ Date: 02 Dec 2025</p>
 </tr>
 <tr>
 <th style="text-align:left;">Gross area</th>
-<td>8052.14 m&#178;</td>
+<td>8293.34 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Total gross heat gain</th>
-<td>483016.87 W</td>
+<td>506219.308 W</td>
 </tr>
 </table>
 <br/>
@@ -67,15 +67,15 @@ Date: 02 Dec 2025</p>
 <td>N/A</td>
 </tr>
 <tr>
-<td>W3</td>
-<td>250mm R.C Beam With Glass Cladding</td>
-<td>1.98 W/m&#178;K</td>
+<td>W1</td>
+<td>250mm R.C Beam</td>
+<td>2.709 W/m&#178;K</td>
 <td>N/A</td>
 </tr>
 <tr>
-<td>W1</td>
-<td>250mm Rc Beam</td>
-<td>2.709 W/m&#178;K</td>
+<td>W3</td>
+<td>250mm R.C Beam With Glass Cladding</td>
+<td>1.98 W/m&#178;K</td>
 <td>N/A</td>
 </tr>
 <tr>
@@ -169,6 +169,37 @@ Date: 02 Dec 2025</p>
 <br/>
 <table>
 <thead>
+<tr><th colspan="4">W1 - 250Mm R.C Beam</th></tr>
+<tr><th>Layer Description</th><th>Thickness (m)</th><th>Thermal Conductivity (W/mK)</th><th>Thermal Resistance (m²K/W)</th></tr>
+</thead>
+<tbody>
+<tr><td>Outside air film</td><td>-</td><td>-</td><td>0.044</td></tr>
+<tr>
+<td>Marble Tile</td>
+<td>0.012</td>
+<td>1.298</td>
+<td>0.009</td>
+</tr>
+<tr>
+<td>RC Concrete</td>
+<td>0.25</td>
+<td>1.442</td>
+<td>0.173</td>
+</tr>
+<tr>
+<td>Cement Plaster</td>
+<td>0.012</td>
+<td>0.533</td>
+<td>0.023</td>
+</tr>
+<tr><td>Inside air film</td><td>-</td><td>-</td><td>0.12</td></tr>
+<tr><td colspan="3" style="text-align:right;">R Total</td><td>0.369</td></tr>
+<tr><td colspan="3" style="text-align:right;">U-Value (1/R Total)</td><td>2.709</td></tr>
+</tbody>
+</table>
+<br/>
+<table>
+<thead>
 <tr><th colspan="4">W3 - 250Mm R.C Beam With Glass Cladding</th></tr>
 <tr><th>Layer Description</th><th>Thickness (m)</th><th>Thermal Conductivity (W/mK)</th><th>Thermal Resistance (m²K/W)</th></tr>
 </thead>
@@ -195,37 +226,6 @@ Date: 02 Dec 2025</p>
 <tr><td>Inside air film</td><td>-</td><td>-</td><td>0.12</td></tr>
 <tr><td colspan="3" style="text-align:right;">R Total</td><td>0.505</td></tr>
 <tr><td colspan="3" style="text-align:right;">U-Value (1/R Total)</td><td>1.98</td></tr>
-</tbody>
-</table>
-<br/>
-<table>
-<thead>
-<tr><th colspan="4">W1 - 250Mm Rc Beam</th></tr>
-<tr><th>Layer Description</th><th>Thickness (m)</th><th>Thermal Conductivity (W/mK)</th><th>Thermal Resistance (m²K/W)</th></tr>
-</thead>
-<tbody>
-<tr><td>Outside air film</td><td>-</td><td>-</td><td>0.044</td></tr>
-<tr>
-<td>Marble Tile</td>
-<td>0.012</td>
-<td>1.298</td>
-<td>0.009</td>
-</tr>
-<tr>
-<td>RC Concrete</td>
-<td>0.25</td>
-<td>1.442</td>
-<td>0.173</td>
-</tr>
-<tr>
-<td>Cement Plaster</td>
-<td>0.012</td>
-<td>0.533</td>
-<td>0.023</td>
-</tr>
-<tr><td>Inside air film</td><td>-</td><td>-</td><td>0.12</td></tr>
-<tr><td colspan="3" style="text-align:right;">R Total</td><td>0.369</td></tr>
-<tr><td colspan="3" style="text-align:right;">U-Value (1/R Total)</td><td>2.709</td></tr>
 </tbody>
 </table>
 <br/>
@@ -285,15 +285,15 @@ Date: 02 Dec 2025</p>
 <tr><th colspan="2">Orientation: South (S)</th></tr>
 <tr>
 <th style="text-align:left;">Average ETTV</th>
-<td>53.558 W/m&#178;</td>
+<td>56.209 W/m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">WWR</th>
-<td>43.42 %</td>
+<td>47.31 %</td>
 </tr>
 <tr>
 <th style="text-align:left;">Window area</th>
-<td>952.4 m&#178;</td>
+<td>1114.4 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Wall area</th>
@@ -301,11 +301,11 @@ Date: 02 Dec 2025</p>
 </tr>
 <tr>
 <th style="text-align:left;">Gross area</th>
-<td>2193.4 m&#178;</td>
+<td>2355.4 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Total gross heat gain</th>
-<td>117473.811 W</td>
+<td>132394.855 W</td>
 </tr>
 <tr>
 <th style="text-align:left;">Correction Factor (CF)</th>
@@ -332,18 +332,18 @@ Date: 02 Dec 2025</p>
 <td>15815.734</td>
 </tr>
 <tr>
+<td>W1</td>
+<td>250mm R.C Beam</td>
+<td>49.5 m&#178;</td>
+<td>2.709</td>
+<td>1609.192</td>
+</tr>
+<tr>
 <td>W3</td>
 <td>250mm R.C Beam With Glass Cladding</td>
 <td>507.3 m&#178;</td>
 <td>1.98</td>
 <td>12055.425</td>
-</tr>
-<tr>
-<td>W1</td>
-<td>250mm Rc Beam</td>
-<td>49.5 m&#178;</td>
-<td>2.709</td>
-<td>1609.192</td>
 </tr>
 <tr>
 <th colspan="10" style="text-align:left;">Fenestration Construction</th>
@@ -356,6 +356,15 @@ Date: 02 Dec 2025</p>
 <th>SC</th>
 <th>3.4 x Area x U-Value</th>
 <th>211 x Area x SC x CF</th>
+</tr>
+<tr>
+<td>F1</td>
+<td>8mm Single Glazing</td>
+<td>162 m&#178;</td>
+<td>5.828</td>
+<td>0.413</td>
+<td>3209.84</td>
+<td>11711.204</td>
 </tr>
 <tr>
 <td>F2</td>
@@ -373,15 +382,15 @@ Date: 02 Dec 2025</p>
 <tr><th colspan="2">Orientation: East (E)</th></tr>
 <tr>
 <th style="text-align:left;">Average ETTV</th>
-<td>66.734 W/m&#178;</td>
+<td>68.161 W/m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">WWR</th>
-<td>43.78 %</td>
+<td>45.90 %</td>
 </tr>
 <tr>
 <th style="text-align:left;">Window area</th>
-<td>884.74 m&#178;</td>
+<td>963.94 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Wall area</th>
@@ -389,11 +398,11 @@ Date: 02 Dec 2025</p>
 </tr>
 <tr>
 <th style="text-align:left;">Gross area</th>
-<td>2020.84 m&#178;</td>
+<td>2100.04 m&#178;</td>
 </tr>
 <tr>
 <th style="text-align:left;">Total gross heat gain</th>
-<td>134858.816 W</td>
+<td>143140.21 W</td>
 </tr>
 <tr>
 <th style="text-align:left;">Correction Factor (CF)</th>
@@ -420,18 +429,18 @@ Date: 02 Dec 2025</p>
 <td>14803.731</td>
 </tr>
 <tr>
+<td>W1</td>
+<td>250mm R.C Beam</td>
+<td>24.2 m&#178;</td>
+<td>2.709</td>
+<td>786.716</td>
+</tr>
+<tr>
 <td>W3</td>
 <td>250mm R.C Beam With Glass Cladding</td>
 <td>471.48 m&#178;</td>
 <td>1.98</td>
 <td>11204.203</td>
-</tr>
-<tr>
-<td>W1</td>
-<td>250mm Rc Beam</td>
-<td>24.2 m&#178;</td>
-<td>2.709</td>
-<td>786.716</td>
 </tr>
 <tr>
 <th colspan="10" style="text-align:left;">Fenestration Construction</th>
@@ -444,6 +453,15 @@ Date: 02 Dec 2025</p>
 <th>SC</th>
 <th>3.4 x Area x U-Value</th>
 <th>211 x Area x SC x CF</th>
+</tr>
+<tr>
+<td>F1</td>
+<td>8mm Single Glazing</td>
+<td>79.2 m&#178;</td>
+<td>5.828</td>
+<td>0.355</td>
+<td>1569.255</td>
+<td>6712.139</td>
 </tr>
 <tr>
 <td>F2</td>
@@ -634,7 +652,6 @@ Date: 02 Dec 2025</p>
 <p>
 All calculations in this report are based on the BCA Code On Envelope Thermal Performance For Buildings document.<br/>
 For more information on the guidelines, visit: <a href="https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements">https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements</a><br/>
-Validation test case report can be found here: [Insert URL]
 </p>
 </body>
 </html>

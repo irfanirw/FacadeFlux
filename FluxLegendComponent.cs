@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
+using FacadeFluxCore;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
-using Rhino.DocObjects;
 
 namespace FacadeFlux
 {
@@ -25,10 +27,7 @@ namespace FacadeFlux
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddColourParameter("Colors", "C", "Colors aligned by index with Legend", GH_ParamAccess.list);
-            pManager.AddTextParameter("Legend", "L", "Legend labels", GH_ParamAccess.list);
-            pManager.AddTextParameter("Legend Title", "T", "Optional legend title", GH_ParamAccess.item);
-            pManager[2].Optional = true;
+            pManager.AddGenericParameter("FluxLegend", "L", "FluxLegend containing Colors, Legend entries, and LegendTitle", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
@@ -41,27 +40,14 @@ namespace FacadeFlux
             _legend.Clear();
             _colors.Clear();
 
-            var colors = new List<Color>();
-            var labels = new List<string>();
-            string title = null;
-
-            DA.GetDataList(0, colors);
-            DA.GetDataList(1, labels);
-            DA.GetData(2, ref title);
-
-            int count = Math.Min(labels.Count, colors.Count);
-            if (count == 0)
+            if (!TryGetLegend(DA, out var legend))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Provide both Legend labels and Colors.");
                 return;
             }
 
-            if (labels.Count != colors.Count)
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Legend and Colors lengths differ; truncating to the shorter list.");
-
-            _legend.AddRange(labels.Take(count));
-            _colors.AddRange(colors.Take(count));
-            _title = string.IsNullOrWhiteSpace(title) ? "Legend" : title.Trim();
+            _legend.AddRange(legend.labels);
+            _colors.AddRange(legend.colors);
+            _title = legend.title;
         }
 
         public override void DrawViewportWires(IGH_PreviewArgs args)
@@ -146,5 +132,148 @@ namespace FacadeFlux
         public override GH_Exposure Exposure => GH_Exposure.primary;
         protected override Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxLegend.png");
         public override Guid ComponentGuid => new Guid("265106EA-9C18-4BC0-8B5E-A02FD78D3DC6");
+
+        private bool TryGetLegend(IGH_DataAccess DA, out (List<string> labels, List<Color> colors, string title) legend)
+        {
+            legend = (new List<string>(), new List<Color>(), "Legend");
+
+            object raw = null;
+            if (!DA.GetData(0, ref raw))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Provide a FluxLegend object.");
+                return false;
+            }
+
+            var fluxLegend = UnwrapLegend(raw);
+            if (fluxLegend == null)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input is not a valid FacadeFluxCore.FluxLegend.");
+                return false;
+            }
+
+            var colors = new List<Color>();
+            foreach (var entry in fluxLegend.Colors?.Cast<object>() ?? Enumerable.Empty<object>())
+            {
+                switch (entry)
+                {
+                    case Color color:
+                        colors.Add(color);
+                        break;
+                    case GH_Colour ghColor when ghColor != null:
+                        colors.Add(ghColor.Value);
+                        break;
+                    case GH_Integer ghInt:
+                        colors.Add(Color.FromArgb(ghInt.Value));
+                        break;
+                    case GH_String ghString when TryParseColor(ghString.Value, out var parsed):
+                        colors.Add(parsed);
+                        break;
+                }
+            }
+
+            var labels = new List<string>();
+            foreach (var item in fluxLegend.Legend ?? new List<object>())
+            {
+                if (TryNormalizeLabel(item, out var label))
+                    labels.Add(label);
+            }
+
+            int count = Math.Min(labels.Count, colors.Count);
+            if (count == 0)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "FluxLegend must contain both Colors and Legend entries.");
+                return false;
+            }
+
+            if (labels.Count != colors.Count)
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "FluxLegend Legend and Colors lengths differ; truncating to the shorter list.");
+
+            legend = (labels.Take(count).ToList(), colors.Take(count).ToList(), NormalizeTitle(fluxLegend.LegendTitle));
+            return true;
+        }
+
+        private static FluxLegend UnwrapLegend(object raw)
+        {
+            if (raw is FluxLegend direct)
+                return direct;
+
+            if (raw is IGH_Goo goo)
+            {
+                if (goo is GH_ObjectWrapper wrapper)
+                {
+                    if (wrapper.Value is FluxLegend wrapped && wrapper.Value.GetType().Assembly == typeof(FluxLegend).Assembly)
+                        return wrapped;
+                }
+
+                if (goo.ScriptVariable() is FluxLegend scriptLegend)
+                    return scriptLegend;
+            }
+
+            return null;
+        }
+
+        private static bool TryNormalizeLabel(object value, out string label)
+        {
+            label = null;
+
+            switch (value)
+            {
+                case null:
+                    return false;
+                case string s when !string.IsNullOrWhiteSpace(s):
+                    label = s.Trim();
+                    return true;
+                case GH_String ghs when !string.IsNullOrWhiteSpace(ghs.Value):
+                    label = ghs.Value.Trim();
+                    return true;
+                case GH_Number ghn when !double.IsNaN(ghn.Value):
+                    label = FormatNumber(ghn.Value);
+                    return true;
+                case GH_Integer ghi:
+                    label = ghi.Value.ToString(CultureInfo.InvariantCulture);
+                    return true;
+                case double d when !double.IsNaN(d):
+                    label = FormatNumber(d);
+                    return true;
+                case float f when !float.IsNaN(f):
+                    label = FormatNumber(f);
+                    return true;
+                case int i:
+                    label = i.ToString(CultureInfo.InvariantCulture);
+                    return true;
+                case long l:
+                    label = l.ToString(CultureInfo.InvariantCulture);
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static string FormatNumber(double value)
+        {
+            return value.ToString("G6", CultureInfo.InvariantCulture);
+        }
+
+        private static string NormalizeTitle(string title)
+        {
+            return string.IsNullOrWhiteSpace(title) ? "Legend" : title.Trim();
+        }
+
+        private static bool TryParseColor(string text, out Color color)
+        {
+            color = Color.Empty;
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            try
+            {
+                color = ColorTranslator.FromHtml(text);
+                return color.ToArgb() != Color.Empty.ToArgb();
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

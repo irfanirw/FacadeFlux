@@ -8,12 +8,18 @@
     ".NETCoreApp,Version=v7.0": {
       "FacadeFluxCore/1.0.0": {
         "dependencies": {
+          "Grasshopper": "8.0.23304.9001",
           "Newtonsoft.Json": "13.0.4",
           "RhinoCommon": "8.0.23304.9001",
           "System.Text.Json": "9.0.10"
         },
         "runtime": {
           "FacadeFluxCore.dll": {}
+        }
+      },
+      "Grasshopper/8.0.23304.9001": {
+        "dependencies": {
+          "RhinoCommon": "8.0.23304.9001"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces/9.0.10": {
@@ -87,6 +93,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Grasshopper/8.0.23304.9001": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-L1Cse6nAxryzcZ7jsu3WzBiG9BYtgYsaNbRV+p55N+THKTFGmXx1PdBbiWtuxK9kB4jyuLVpeV8XBiYlSGA1Vw==",
+      "path": "grasshopper/8.0.23304.9001",
+      "hashPath": "grasshopper.8.0.23304.9001.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/9.0.10": {
       "type": "package",

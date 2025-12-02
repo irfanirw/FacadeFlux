@@ -32,9 +32,7 @@ namespace FacadeFlux
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
             pManager.AddMeshParameter("Meshes", "Mesh", "Preview meshes with vertex colors", GH_ParamAccess.list);
-            pManager.AddColourParameter("Colors", "C", "Colors mapped to Construction Type in legend order", GH_ParamAccess.list);
-            pManager.AddTextParameter("ConstructionType", "CT", "Construction Types in the same order as Colors", GH_ParamAccess.list);
-            pManager.AddTextParameter("LegendTitle", "T", "Legend title matching the Colors/Legend outputs", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxLegend", "L", "Legend data containing Colors, ConstructionType entries, and LegendTitle", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -44,9 +42,7 @@ namespace FacadeFlux
             if (!TryCollectSurfaces(DA, out var surfaces))
             {
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, new[] { "No FluxModel data provided." });
-                DA.SetData(3, "Flux Construction Types");
+                DA.SetData(1, BuildLegend(null, new[] { "No FluxModel data provided." }, "Flux Construction Types"));
                 return;
             }
 
@@ -88,9 +84,7 @@ namespace FacadeFlux
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No valid geometry could be drawn from the provided surfaces.");
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, new[] { "No valid geometry generated." });
-                DA.SetData(3, "Flux Construction Types");
+                DA.SetData(1, BuildLegend(null, new[] { "No valid geometry generated." }, "Flux Construction Types"));
                 return;
             }
 
@@ -101,9 +95,7 @@ namespace FacadeFlux
             }
 
             DA.SetDataList(0, meshesOut);
-            DA.SetDataList(1, colorsOut);
-            DA.SetDataList(2, legendLines);
-            DA.SetData(3, "Flux Construction Types");
+            DA.SetData(1, BuildLegend(colorsOut, legendLines, "Flux Construction Types"));
         }
 
         private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)
@@ -256,9 +248,9 @@ namespace FacadeFlux
         private static Color ColorForType(string type, int paletteIndex)
         {
             if (type.Equals("Fenestration", StringComparison.OrdinalIgnoreCase))
-                return Color.FromArgb(186, 225, 255); // light blue
+                return Color.FromArgb(40, 85, 170);   // dark blue for fenestration
             if (type.Equals("Opaque", StringComparison.OrdinalIgnoreCase))
-                return Color.FromArgb(255, 223, 186); // warm beige
+                return Color.FromArgb(178, 34, 34);   // dark red for opaque
 
             return PastelColor(paletteIndex);
         }
@@ -298,5 +290,29 @@ namespace FacadeFlux
         public override GH_Exposure Exposure => GH_Exposure.secondary;
         protected override Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.DisplayFluxConstructionType.png");
         public override Guid ComponentGuid => new Guid("7E2B9D99-5A1D-4F9B-92E0-FE72C5C5FC24");
+
+        private static FluxLegend BuildLegend(IEnumerable<Color> colors, IEnumerable<string> labels, string title)
+        {
+            var legendColors = new List<GH_Colour>();
+            if (colors != null)
+            {
+                foreach (var c in colors)
+                    legendColors.Add(new GH_Colour(c));
+            }
+
+            var legendLabels = new List<object>();
+            if (labels != null)
+            {
+                foreach (var l in labels)
+                    legendLabels.Add(l);
+            }
+
+            return new FluxLegend
+            {
+                Colors = legendColors,
+                Legend = legendLabels,
+                LegendTitle = title ?? string.Empty
+            };
+        }
     }
 }

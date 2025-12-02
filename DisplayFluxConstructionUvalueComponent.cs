@@ -30,9 +30,7 @@ namespace FacadeFlux
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
             pManager.AddMeshParameter("Meshes", "Mesh", "Preview meshes with vertex colors", GH_ParamAccess.list);
-            pManager.AddColourParameter("Colors", "C", "Colors mapped to U-values in legend order", GH_ParamAccess.list);
-            pManager.AddTextParameter("Uvalue", "U", "U-values in the same order as Colors", GH_ParamAccess.list);
-            pManager.AddTextParameter("LegendTitle", "T", "Legend title matching the Colors/Legend outputs", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxLegend", "L", "Legend data containing Colors, Uvalue entries, and LegendTitle", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -42,9 +40,7 @@ namespace FacadeFlux
             if (!TryCollectSurfaces(DA, out var surfaces))
             {
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, new[] { "No FluxModel data provided." });
-                DA.SetData(3, "U-value (W/m²K)");
+                DA.SetData(1, BuildLegend(null, new[] { "No FluxModel data provided." }, "U-value (W/m²K)"));
                 return;
             }
 
@@ -85,9 +81,7 @@ namespace FacadeFlux
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No valid geometry could be drawn from the provided surfaces.");
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, new[] { "No valid geometry generated." });
-                DA.SetData(3, "U-value (W/m²K)");
+                DA.SetData(1, BuildLegend(null, new[] { "No valid geometry generated." }, "U-value (W/m²K)"));
                 return;
             }
 
@@ -107,9 +101,7 @@ namespace FacadeFlux
             }
 
             DA.SetDataList(0, meshesOut);
-            DA.SetDataList(1, colorsOut);
-            DA.SetDataList(2, legendLines);
-            DA.SetData(3, "U-value (W/m²K)");
+            DA.SetData(1, BuildLegend(colorsOut, legendLines, "U-value (W/m²K)"));
         }
 
         private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)
@@ -287,5 +279,29 @@ namespace FacadeFlux
         protected override System.Drawing.Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.DisplaySurfaceUvalue.png");
 
         public override Guid ComponentGuid => new Guid("651C0097-AF5D-4C93-B13C-07C53AF61838");
+
+        private static FluxLegend BuildLegend(IEnumerable<Color> colors, IEnumerable<string> labels, string title)
+        {
+            var legendColors = new List<GH_Colour>();
+            if (colors != null)
+            {
+                foreach (var c in colors)
+                    legendColors.Add(new GH_Colour(c));
+            }
+
+            var legendLabels = new List<object>();
+            if (labels != null)
+            {
+                foreach (var l in labels)
+                    legendLabels.Add(l);
+            }
+
+            return new FluxLegend
+            {
+                Colors = legendColors,
+                Legend = legendLabels,
+                LegendTitle = title ?? string.Empty
+            };
+        }
     }
 }

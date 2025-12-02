@@ -212,7 +212,6 @@ Date: {WebUtility.HtmlEncode(dateText)}</p>
 <p>
 All calculations in this report are based on the BCA Code On Envelope Thermal Performance For Buildings document.<br/>
 For more information on the guidelines, visit: <a href=""https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements"">https://www1.bca.gov.sg/buildsg/sustainability/green-mark-incentive-schemes/ettv-requirements</a><br/>
-Validation test case report can be found here: [Insert URL]
 </p>";
 
             return $@"<!DOCTYPE html>

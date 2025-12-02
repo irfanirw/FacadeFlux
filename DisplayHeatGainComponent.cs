@@ -10,12 +10,12 @@ using FacadeFluxCore;
 
 namespace FacadeFlux
 {
-    public class FluxModelSurfaceHeatGainComponent : GH_Component
+    public class DisplayHeatGainComponent : GH_Component
     {
         private readonly List<(Mesh mesh, Color color)> _previewMeshes = new();
 
-        public FluxModelSurfaceHeatGainComponent()
-            : base("FluxModelSurfaceHeatGain", "FMSHG",
+        public DisplayHeatGainComponent()
+            : base("Display Heat Gain", "DHG",
                    "Preview FluxModelResult surfaces colored by average heat gain (Jet scale).",
                    "FacadeFlux", "3 :: Post-processing")
         {
@@ -30,9 +30,7 @@ namespace FacadeFlux
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
             pManager.AddMeshParameter("Meshes", "Mesh", "FluxSurface geometries colored by heat gain", GH_ParamAccess.list);
-            pManager.AddColourParameter("Colors", "C", "Legend colors from low to high heat gain (Jet scale)", GH_ParamAccess.list);
-            pManager.AddNumberParameter("HeatGain", "H", "Average heat gain legend values aligned with Colors (W/m²)", GH_ParamAccess.list);
-            pManager.AddTextParameter("LegendTitle", "T", "Legend title", GH_ParamAccess.item);
+            pManager.AddGenericParameter("FluxLegend", "L", "Legend data containing Colors, HeatGain entries, and LegendTitle", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -43,9 +41,7 @@ namespace FacadeFlux
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No FluxModelResult data provided.");
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, null);
-                DA.SetData(3, "Average HeatGain (W/m²)");
+                DA.SetData(1, BuildLegend(null, new object[] { "No FluxModelResult data provided." }, "Average HeatGain (W/m²)"));
                 return;
             }
 
@@ -69,9 +65,7 @@ namespace FacadeFlux
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No valid geometry could be drawn from the provided surfaces.");
                 DA.SetDataList(0, null);
-                DA.SetDataList(1, null);
-                DA.SetDataList(2, null);
-                DA.SetData(3, "Average HeatGain (W/m²)");
+                DA.SetData(1, BuildLegend(null, new object[] { "No valid geometry generated." }, "Average HeatGain (W/m²)"));
                 return;
             }
 
@@ -95,9 +89,7 @@ namespace FacadeFlux
                 .ToList();
 
             DA.SetDataList(0, meshesOut);
-            DA.SetDataList(1, legendColors);
-            DA.SetDataList(2, legendValues);
-            DA.SetData(3, "Average HeatGain (W/m²)");
+            DA.SetData(1, BuildLegend(legendColors, legendValues.Select(v => (object)v), "Average HeatGain (W/m²)"));
         }
 
         private static bool TryCollectSurfaces(IGH_DataAccess DA, out List<FluxSurface> surfaces)
@@ -292,5 +284,29 @@ namespace FacadeFlux
         protected override Bitmap Icon => IconHelper.LoadIcon("FacadeFlux.Icons.FluxModelSurfaceHeatGain.png");
 
         public override Guid ComponentGuid => new Guid("CF7C3F3E-784A-4A9B-946A-2182C105D8AC");
+
+        private static FluxLegend BuildLegend(IEnumerable<Color> colors, IEnumerable<object> values, string title)
+        {
+            var legendColors = new List<GH_Colour>();
+            if (colors != null)
+            {
+                foreach (var c in colors)
+                    legendColors.Add(new GH_Colour(c));
+            }
+
+            var legendLabels = new List<object>();
+            if (values != null)
+            {
+                foreach (var v in values)
+                    legendLabels.Add(v);
+            }
+
+            return new FluxLegend
+            {
+                Colors = legendColors,
+                Legend = legendLabels,
+                LegendTitle = title ?? string.Empty
+            };
+        }
     }
 }

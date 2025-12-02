@@ -267,6 +267,7 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.8",
         "dependencies": {
+          "Grasshopper": "8.0.23304.9001",
           "Newtonsoft.Json": "13.0.4",
           "RhinoCommon": "8.0.23304.9001",
           "System.Text.Json": "9.0.10"
@@ -521,6 +522,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
         "dependencies": {
+          "Grasshopper": "8.0.23304.9001",
           "Newtonsoft.Json": "13.0.4",
           "RhinoCommon": "8.0.23304.9001",
           "System.Text.Json": "9.0.10"
@@ -722,6 +724,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
         "dependencies": {
+          "Grasshopper": "8.0.23304.9001",
           "Newtonsoft.Json": "13.0.4",
           "RhinoCommon": "8.0.23304.9001",
           "System.Text.Json": "9.0.10"
