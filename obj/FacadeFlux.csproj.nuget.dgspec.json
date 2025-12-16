@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFlux.csproj": {}
+    "/Users/irfan/Projects/BcaEttv/FacadeFlux.csproj": {}
   },
   "projects": {
-    "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFlux.csproj": {
+    "/Users/irfan/Projects/BcaEttv/FacadeFlux.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFlux.csproj",
+        "projectUniqueName": "/Users/irfan/Projects/BcaEttv/FacadeFlux.csproj",
         "projectName": "FacadeFlux",
-        "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFlux.csproj",
+        "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFlux.csproj",
         "packagesPath": "/Users/irfan/.nuget/packages/",
-        "outputPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/obj/",
+        "outputPath": "/Users/irfan/Projects/BcaEttv/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "configFilePaths": [
@@ -29,24 +29,24 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj": {
-                "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj"
+              "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj": {
+                "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj"
               }
             }
           },
           "net7.0-windows7.0": {
             "targetAlias": "net7.0-windows",
             "projectReferences": {
-              "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj": {
-                "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj"
+              "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj": {
+                "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj"
               }
             }
           },
           "net48": {
             "targetAlias": "net48",
             "projectReferences": {
-              "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj": {
-                "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj"
+              "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj": {
+                "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj"
               }
             }
           }
@@ -182,14 +182,14 @@
         }
       }
     },
-    "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj": {
+    "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+        "projectUniqueName": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
         "projectName": "FacadeFluxCore",
-        "projectPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/FacadeFluxCore.csproj",
+        "projectPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/FacadeFluxCore.csproj",
         "packagesPath": "/Users/irfan/.nuget/packages/",
-        "outputPath": "/Users/irfan/Documents/Learn/GitHub/FacadeFlux/FacadeFluxCore/obj/",
+        "outputPath": "/Users/irfan/Projects/BcaEttv/FacadeFluxCore/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "configFilePaths": [
