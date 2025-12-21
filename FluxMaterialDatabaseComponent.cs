@@ -57,7 +57,7 @@ namespace FacadeFlux
 
         public FluxMaterialDatabaseComponent()
           : base("FluxMaterialDatabase", "EMD",
-                 "Select building material and get its thermal conductivity (k-value)",
+                 "Select building material and get its thermal conductivity (k-value) from the BCA database. Right-click this component to pick a material from the database (materials mirror the official BCA material database).",
                  "FacadeFlux", "1 :: Input & Geometry")
         { }
 
